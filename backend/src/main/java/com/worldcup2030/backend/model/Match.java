@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "matches")
 public class Match {
     @Id @GeneratedValue
     private Long id;
