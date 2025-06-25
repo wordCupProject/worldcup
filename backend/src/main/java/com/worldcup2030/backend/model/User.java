@@ -1,15 +1,19 @@
 package com.worldcup2030.backend.model;
-import java.util.List;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 public class User {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
+    private String phone;
+    private String country;
     private String password;
     private String role;
 
@@ -22,20 +26,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<TransportReservation> transportReservations;
 
-    public User() {
-    }
+    // Getters & setters
+    // ... (générés par ton IDE)
 
-    public User(Long id, String name, String email, String password, String role, List<Ticket> tickets,
-            List<HotelReservation> hotelReservations, List<TransportReservation> transportReservations) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.tickets = tickets;
-        this.hotelReservations = hotelReservations;
-        this.transportReservations = transportReservations;
-    }
 
     public Long getId() {
         return id;
@@ -45,12 +38,20 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -59,6 +60,22 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getPassword() {
@@ -100,7 +117,4 @@ public class User {
     public void setTransportReservations(List<TransportReservation> transportReservations) {
         this.transportReservations = transportReservations;
     }
-
-    
 }
-
