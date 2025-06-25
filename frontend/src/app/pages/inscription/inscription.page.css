@@ -1,0 +1,66 @@
+/* src/app/pages/inscription/inscription.page.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background:
+    /* Couche de dégradé semi-transparent */
+    linear-gradient(
+      rgba(0, 0, 0, 0.7),
+      rgba(0, 0, 0, 0.7)
+    ),
+    /* Puis l’image en dessous */
+    url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
+  background-size: cover;
+  background-position: center;
+  padding: 1rem;
+}
+
+.card-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
+.btn-primary {
+  background: linear-gradient(
+    to right,
+    #C1272D,
+    #9c1c22
+  );
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(193, 39, 45, 0.3);
+}
+
+.input-field:focus {
+  border-color: #C1272D;
+  box-shadow: 0 0 0 3px rgba(193, 39, 45, 0.2);
+}
+
+.logo-text {
+  background: linear-gradient(
+    to right,
+    #C1272D,
+    #006233
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ring-2 {
+  box-shadow: 0 0 0 3px rgba(193, 39, 45, 0.2);
+  border-radius: 0.5rem;
+}
+
+.transform.scale-95 {
+  transform: scale(0.95);
+}
