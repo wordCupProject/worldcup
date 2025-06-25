@@ -1,64 +1,79 @@
 // src/app/pages/inscription/inscription.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // Ajout important
-import { ReactiveFormsModule } from '@angular/forms'; // Ajout important
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService, RegisterPayload } from '../../services/auth.service';
 
 @Component({
   selector: 'app-inscription-page',
+  standalone: true,
+  imports: [  CommonModule,
+    ReactiveFormsModule ],
   templateUrl: './inscription.page.html',
-  styleUrls: ['./inscription.page.css'],
-  standalone: true, // Marquer comme standalone
-  imports: [CommonModule, ReactiveFormsModule] // Importer les modules nécessaires
+  styleUrls: ['./inscription.page.css']
 })
 export class InscriptionPage {
   registerForm: FormGroup;
-  fieldFocus: { [key: string]: boolean } = {};
-  buttonDown: { [key: string]: boolean } = {};
+  fieldFocus:   { [key: string]: boolean } = {};
+  buttonDown:   { [key: string]: boolean } = {};
 
   countries = [
     { value: 'MA', name: 'Maroc' },
-    { value: 'FR', name: 'France' },
-    { value: 'ES', name: 'Espagne' },
-    { value: 'DZ', name: 'Algérie' },
-    { value: 'TN', name: 'Tunisie' },
-    { value: 'BR', name: 'Brésil' },
-    { value: 'PT', name: 'Portugal' }
+    // ...
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService
+  ) {
     this.registerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      country: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      firstName:       ['', Validators.required],
+      lastName:        ['', Validators.required],
+      email:           ['', [Validators.required, Validators.email]],
+      phone:           ['', Validators.required],
+      country:         ['', Validators.required],
+      password:        ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
-      terms: [false, Validators.requiredTrue]
+      terms:           [false, Validators.requiredTrue]
     }, { validator: this.passwordMatchValidator });
   }
 
-  passwordMatchValidator(formGroup: FormGroup) {
-    const password = formGroup.get('password')?.value;
-    const confirmPassword = formGroup.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
+  passwordMatchValidator(form: FormGroup) {
+    return form.get('password')!.value === form.get('confirmPassword')!.value
+      ? null : { mismatch: true };
   }
 
   setFocus(field: string, isFocused: boolean) {
     this.fieldFocus[field] = isFocused;
   }
 
-  setButtonDown(button: string, isDown: boolean) {
-    this.buttonDown[button] = isDown;
+  setButtonDown(btn: string, down: boolean) {
+    this.buttonDown[btn] = down;
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
-      console.log('Formulaire soumis:', this.registerForm.value);
-      // Logique d'inscription ici
-    } else {
+    if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      return;
     }
+
+    const payload: RegisterPayload = {
+      firstName: this.registerForm.value.firstName,
+      lastName:  this.registerForm.value.lastName,
+      email:     this.registerForm.value.email,
+      phone:     this.registerForm.value.phone,
+      country:   this.registerForm.value.country,
+      password:  this.registerForm.value.password,
+    };
+
+    this.auth.register(payload).subscribe({
+      next: res => {
+        alert(res.message);      // ou rediriger vers /login
+      },
+      error: err => {
+        alert(err.error?.message || 'Une erreur est survenue');
+      }
+    });
   }
 }
