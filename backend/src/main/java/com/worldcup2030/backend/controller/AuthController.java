@@ -1,5 +1,6 @@
 package com.worldcup2030.backend.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,29 +14,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.worldcup2030.backend.dto.LoginRequest;
 import com.worldcup2030.backend.dto.RegisterRequest;
-import com.worldcup2030.backend.model.User;
 import com.worldcup2030.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@CrossOrigin(origins = "*") // autoriser tous les domaines pour le front
 public class AuthController {
 
-    @Autowired private UserService userService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody RegisterRequest request) {
+        Map<String, String> response = new HashMap<>();
         try {
             userService.register(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Utilisateur inscrit !");
+            response.put("message", "Utilisateur inscrit avec succès !");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Inscription échouée : " + e.getMessage());
+            response.put("message", "Inscription échouée : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
-        String token = userService.login(request);
-        return ResponseEntity.ok(Map.of("token", token));
+        Map<String, String> response = new HashMap<>();
+        try {
+            String token = userService.login(request);
+            response.put("token", token);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("message", "Échec de la connexion : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
     }
 }
