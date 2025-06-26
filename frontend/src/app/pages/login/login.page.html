@@ -1,0 +1,157 @@
+<div class="flex items-center justify-center p-4 min-h-screen bg-gray-100">
+  <div class="max-w-4xl w-full flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-2xl">
+
+    <!-- Section gauche – fond noir -->
+    <div class="w-full md:w-2/5 bg-black p-8 text-white flex flex-col justify-between">
+      <div>
+        <div class="flex items-center mb-10">
+          <i class="fas fa-futbol text-3xl mr-3"></i>
+          <span class="font-bold text-2xl">MAROC 2030</span>
+        </div>
+        <h1 class="text-3xl font-bold mb-4">Bienvenue à bord</h1>
+        <p class="text-lg opacity-90">
+          Accédez à votre espace personnel pour gérer votre expérience de la Coupe du Monde 2030.
+        </p>
+      </div>
+      <ul class="space-y-6 mt-10">
+        <li class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-white text-[#C1272D] flex items-center justify-center mr-4">
+            <i class="fas fa-ticket-alt"></i>
+          </div>
+          <div>
+            <h3 class="font-bold">Vos billets</h3>
+            <p class="text-sm opacity-80">Accédez à vos réservations</p>
+          </div>
+        </li>
+        <li class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-white text-[#006233] flex items-center justify-center mr-4">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div>
+            <h3 class="font-bold">Votre agenda</h3>
+            <p class="text-sm opacity-80">Planifiez votre expérience</p>
+          </div>
+        </li>
+        <li class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-white text-blue-500 flex items-center justify-center mr-4">
+            <i class="fas fa-users"></i>
+          </div>
+          <div>
+            <h3 class="font-bold">Votre communauté</h3>
+            <p class="text-sm opacity-80">Connectez-vous avec d’autres fans</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Section droite – formulaire de connexion -->
+    <div class="w-full md:w-3/5 card-gradient p-8 md:p-12 bg-white">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold mb-2 logo-text">Connexion</h2>
+        <p class="text-gray-600">Entrez vos informations pour vous connecter</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        <!-- Email -->
+        <div>
+          <label class="block text-gray-700 mb-2">Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input
+              type="email"
+              formControlName="email"
+              class="input-field w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none"
+              placeholder="email@exemple.com">
+          </div>
+          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+               class="text-red-500 text-sm mt-1">
+            <span *ngIf="loginForm.get('email')?.hasError('required')">L’email est requis</span>
+            <span *ngIf="loginForm.get('email')?.hasError('email')">Format invalide</span>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div>
+          <label class="block text-gray-700 mb-2">Mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              class="input-field w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none"
+              placeholder="••••••••">
+            <button type="button"
+                    (click)="togglePasswordVisibility()"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+              <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+               class="text-red-500 text-sm mt-1">
+            <span *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est requis</span>
+            <span *ngIf="loginForm.get('password')?.hasError('minlength')">8 caractères minimum</span>
+          </div>
+        </div>
+
+        <!-- Checkbox & mot de passe oublié -->
+        <div class="flex justify-between items-center">
+          <label class="flex items-center">
+            <input type="checkbox" formControlName="rememberMe"
+                   class="h-4 w-4 text-[#C1272D] focus:ring-[#C1272D] border-gray-300 rounded"/>
+            <span class="ml-2 text-sm text-gray-700">Se souvenir de moi</span>
+          </label>
+          <a href="#" class="text-sm text-[#C1272D] hover:underline">Mot de passe oublié ?</a>
+        </div>
+
+        <!-- Bouton Se connecter -->
+        <div>
+          <button type="submit"
+                  [disabled]="isLoading"
+                  class="btn-primary w-full py-3 px-4 rounded-lg text-white font-bold text-lg flex justify-center items-center"
+                  [class.opacity-70]="isLoading">
+            <span *ngIf="!isLoading">Se connecter</span>
+            <span *ngIf="isLoading"><i class="fas fa-spinner fa-spin mr-2"></i>Connexion...</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Lien vers inscription -->
+      <div class="mt-6 text-center">
+        <p class="text-gray-600">
+          Pas encore de compte ?
+          <a routerLink="/inscription" class="text-[#C1272D] font-medium hover:underline">Inscrivez-vous</a>
+        </p>
+      </div>
+
+      <!-- Section sociale -->
+      <div class="mt-8">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">Ou connectez-vous avec</span>
+          </div>
+        </div>
+        <div class="mt-6 grid grid-cols-3 gap-3">
+          <button (click)="loginWithProvider('facebook')"
+                  class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center">
+            <i class="fab fa-facebook-f text-blue-600 mr-2"></i>Facebook
+          </button>
+          <button (click)="loginWithProvider('google')"
+                  class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center">
+            <i class="fab fa-google text-red-600 mr-2"></i>Google
+          </button>
+          <button (click)="loginWithProvider('twitter')"
+                  class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center">
+            <i class="fab fa-twitter text-blue-400 mr-2"></i>Twitter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
