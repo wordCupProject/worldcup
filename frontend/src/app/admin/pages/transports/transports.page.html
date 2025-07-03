@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestion des Transports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>Liste des moyens de transport</h2>
+
+  <ion-list>
+    <ion-item *ngFor="let transport of transports">
+      <ion-label>
+        <h3>{{ transport.type }}</h3>
+        <p>Ville : {{ transport.city }}</p>
+        <p>Capacité : {{ transport.capacity }} passagers</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="full" color="success" class="mt-4">
+    Ajouter un transport
+  </ion-button>
+</ion-content>
