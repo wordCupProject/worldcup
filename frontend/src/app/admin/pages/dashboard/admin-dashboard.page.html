@@ -1,0 +1,51 @@
+<!-- src/app/admin/pages/admin-dashboard/admin-dashboard.page.html -->
+<div class="mb-8">
+  <h2 class="text-2xl font-bold">Tableau de bord</h2>
+  <p class="text-gray-600">Gestion des organisations de la Coupe du Monde 2030</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div *ngFor="let stat of stats" class="bg-white p-6 rounded-lg shadow">
+    <div class="flex items-center">
+      <div class="p-3 rounded-full mr-4" [ngClass]="stat.color">
+        <fa-icon [icon]="stat.icon" class="text-white text-xl"></fa-icon>
+      </div>
+      <div>
+        <p class="text-gray-500">{{ stat.title }}</p>
+        <p class="text-2xl font-bold">{{ stat.value }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+  <h3 class="text-lg font-semibold mb-4">Dernières organisations</h3>
+  <table class="min-w-full">
+    <thead>
+      <tr>
+        <th class="text-left py-2">Nom</th>
+        <th class="text-left py-2">Type</th>
+        <th class="text-left py-2">Ville</th>
+        <th class="text-left py-2">Statut</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="py-2">Kenzi Tower</td>
+        <td class="py-2">Hôtel</td>
+        <td class="py-2">Casablanca</td>
+        <td class="py-2">
+          <span class="px-2 py-1 rounded bg-green-100 text-green-800">Actif</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="py-2">CTM Voyageurs</td>
+        <td class="py-2">Transport</td>
+        <td class="py-2">National</td>
+        <td class="py-2">
+          <span class="px-2 py-1 rounded bg-green-100 text-green-800">Actif</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
