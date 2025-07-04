@@ -1,37 +1,51 @@
 <!-- src/app/admin/components/sidebar/sidebar.component.html -->
-<div class="w-64 bg-gray-800 text-white h-full">
+<aside class="w-64 bg-gray-800 text-white min-h-screen">
   <div class="p-4 border-b border-gray-700">
     <h1 class="text-xl font-bold">CM Maroc 2030</h1>
     <p class="text-xs text-gray-400">Administration</p>
   </div>
-  
+
   <nav class="mt-5">
-    <a routerLink="/admin/dashboard" 
-       routerLinkActive="bg-gray-700" 
+    <!-- Tableau de bord -->
+    <a routerLink="/admin/dashboard"
+       routerLinkActive="bg-gray-700"
        class="block px-4 py-3 hover:bg-gray-700">
       <fa-icon [icon]="faHome" class="mr-3"></fa-icon>
       Tableau de bord
     </a>
-    
-    <a routerLink="/admin/hotels" 
-       routerLinkActive="bg-gray-700" 
-       class="block px-4 py-3 hover:bg-gray-700">
+
+    <!-- Section Gestion -->
+    <p class="px-6 py-2 text-gray-400 text-sm uppercase mt-4">Gestion</p>
+
+    <a routerLink="/admin/hotels"
+       routerLinkActive="bg-primary text-white"
+       class="block px-6 py-3 hover:bg-gray-700">
       <fa-icon [icon]="faHotel" class="mr-3"></fa-icon>
       Hôtels
     </a>
-    
-    <a routerLink="/admin/transports" 
-       routerLinkActive="bg-gray-700" 
-       class="block px-4 py-3 hover:bg-gray-700">
+
+    <a routerLink="/admin/transports"
+       routerLinkActive="bg-gray-700"
+       class="block px-6 py-3 hover:bg-gray-700">
       <fa-icon [icon]="faBus" class="mr-3"></fa-icon>
       Transports
     </a>
-    
-    <a routerLink="/admin/organizations" 
-       routerLinkActive="bg-gray-700" 
-       class="block px-4 py-3 hover:bg-gray-700">
+
+    <a routerLink="/admin/organizations"
+       routerLinkActive="bg-gray-700"
+       class="block px-6 py-3 hover:bg-gray-700">
       <fa-icon [icon]="faUsers" class="mr-3"></fa-icon>
       Organisations
     </a>
+
+    <!-- Section Configuration -->
+    <p class="px-6 py-2 text-gray-400 text-sm uppercase mt-4">Configuration</p>
+
+    <a routerLink="/admin/settings"
+       routerLinkActive="bg-gray-700"
+       class="block px-6 py-3 hover:bg-gray-700">
+      <fa-icon [icon]="faCog" class="mr-3"></fa-icon>
+      Paramètres
+    </a>
   </nav>
-</div>
+</aside>
