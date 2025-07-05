@@ -1,0 +1,25 @@
+.form-radio:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.form-checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.text-primary {
+  color: #3b82f6;
+}
+
+.bg-primary {
+  background-color: #3b82f6;
+}
+
+.hover\:bg-red-600:hover {
+  background-color: #dc2626;
+}
+
+.focus\:ring-primary:focus {
+  --tw-ring-color: rgba(59, 130, 246, 0.5);
+}
