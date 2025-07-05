@@ -4,7 +4,9 @@ import { AdminDashboardPage } from './pages/dashboard/admin-dashboard.page';
 import { HotelsPage } from './pages/hotels/hotels.page';
 import { TransportsPage } from './pages/transports/transports.page';
 import { OrganizationsPage } from './pages/organizations/organizations.page';
+import{AdminsPage} from './pages/admins/admins.page'
 import { AdminLayoutComponent } from './admin-layout.component';
+
 
 export const adminRoutes: Routes = [
   {
@@ -15,6 +17,7 @@ export const adminRoutes: Routes = [
       { path: 'hotels', component: HotelsPage },
       { path: 'transports', component: TransportsPage },
       { path: 'organizations', component: OrganizationsPage },
+      { path: 'admins', component: AdminsPage },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   }
