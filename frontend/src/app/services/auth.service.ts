@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Interface pour l'inscription
+
 export interface RegisterPayload {
   firstName: string;
   lastName:  string;
@@ -12,6 +12,7 @@ export interface RegisterPayload {
   country:   string;
   password:  string;
 }
+
 
 // Interface pour la connexion
 export interface LoginPayload {
@@ -34,12 +35,15 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   // ✅ Enregistrement
+
   register(payload: RegisterPayload): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/register`, payload);
   }
+
 
   // ✅ Connexion
   login(payload: LoginPayload): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/login`, payload);
   }
+
 }

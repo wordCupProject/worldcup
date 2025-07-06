@@ -1,9 +1,38 @@
-ion-item {
-  margin-bottom: 8px;
-  border-radius: 8px;
-  background: #f0f4f8;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+.transport-card {
+  border-left: 4px solid #3b82f6;
 }
-.mt-4 {
-  margin-top: 16px;
+
+.match-badge {
+  background-color: #e0f2fe;
+  color: #0369a1;
 }
+
+.bus-seat {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 500;
+  
+  &.selected {
+    background-color: #bfdbfe;
+    border-color: #3b82f6;
+  }
+  
+  &.reserved {
+    background-color: #fecaca;
+    border-color: #ef4444;
+    cursor: not-allowed;
+  }
+}
+
+.text-transport {
+  color: #3b82f6;
+}
+
