@@ -13,7 +13,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+
     private final String SECRET = "ma_clé_super_secrète_ultra_longue_et_complexe_123456";
+
 
 
     public String generateToken(String email) {

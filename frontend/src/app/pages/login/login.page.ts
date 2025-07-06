@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service'; // ✅ importe le service
@@ -11,6 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
   selector: 'app-login-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule], // ✅ HttpClientModule est utile ici
+\
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.css']
 })
@@ -19,11 +21,13 @@ export class LoginPage {
   showPassword = false;
   isLoading = false;
 
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService // ✅ injecte ici
   ) {
+
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
@@ -38,6 +42,7 @@ export class LoginPage {
   onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading = true;
+
       const loginData = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password
@@ -56,10 +61,12 @@ export class LoginPage {
   }
 });
 
+
     } else {
       this.loginForm.markAllAsTouched();
     }
   }
+
 
 loginWithProvider(provider: string) {
   if (provider === 'google') {
@@ -69,3 +76,4 @@ loginWithProvider(provider: string) {
 }
 
 }
+
