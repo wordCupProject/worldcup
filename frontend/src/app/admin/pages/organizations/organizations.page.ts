@@ -1,4 +1,4 @@
-// src/app/admin/pages/organizations/organizations.page.ts
+
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -199,3 +199,4 @@ export class OrganizationsPage implements OnInit {
       : 'bg-yellow-100 text-yellow-800';
   }
 }
+
