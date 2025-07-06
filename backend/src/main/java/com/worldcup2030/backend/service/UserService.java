@@ -1,6 +1,8 @@
 package com.worldcup2030.backend.service;
 
+
 import java.util.Optional;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +48,7 @@ public class UserService {
         return jwtService.generateToken(user.getEmail());
     }
 
+
     public String loginOrRegisterOauthUser(String email, String firstName, String lastName) {
     Optional<User> existingUser = userRepository.findByEmail(email);
 
@@ -62,5 +65,6 @@ public class UserService {
 
     return jwtService.generateToken(email);
 }
+
 
 }
