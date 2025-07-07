@@ -12,7 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
   selector: 'app-login-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule], // ✅ HttpClientModule est utile ici
-
+\
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.css']
 })
