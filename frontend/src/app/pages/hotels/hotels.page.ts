@@ -126,6 +126,7 @@ export class HotelsPage {
   onSearch() {
     // Ici on peut déclencher d'autres actions si besoin,
     // mais la getter filteredHotels est reactive avec les bindings Angular.
+    alert('jfjjfjfj');
   }
 
 }
