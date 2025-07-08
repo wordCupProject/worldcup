@@ -1,46 +1,19 @@
-package com.worldcup2030.backend.model;
+package com.worldcup2030.backend.dto;
 
-import jakarta.persistence.*;
 import java.util.List;
 
-@Entity
-@Table(name = "hotel")
-public class Hotel {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+public class HotelDTO {
     private String name;
-
-    @Column(nullable = false)
     private String city;
-
-    @Column(nullable = false)
     private int stars;
-
-    @Column(nullable = false)
     private String address;
-
-    @Column(columnDefinition = "TEXT")
     private String description;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "hotel_services",
-            joinColumns = @JoinColumn(name = "hotel_id")
-    )
-    @Column(name = "service")
     private List<String> services;
 
-    @Column
-    private String photoUrl;
-
     // Constructeurs
-    public Hotel() {}
+    public HotelDTO() {}
 
-    public Hotel(String name, String city, int stars, String address, String description, List<String> services) {
+    public HotelDTO(String name, String city, int stars, String address, String description, List<String> services) {
         this.name = name;
         this.city = city;
         this.stars = stars;
@@ -50,14 +23,6 @@ public class Hotel {
     }
 
     // Getters et Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -106,25 +71,15 @@ public class Hotel {
         this.services = services;
     }
 
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
     @Override
     public String toString() {
-        return "Hotel{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+        return "HotelDTO{" +
+                "name='" + name + '\'' +
                 ", city='" + city + '\'' +
                 ", stars=" + stars +
                 ", address='" + address + '\'' +
                 ", description='" + description + '\'' +
                 ", services=" + services +
-                ", photoUrl='" + photoUrl + '\'' +
                 '}';
     }
 }
