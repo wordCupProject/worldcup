@@ -1,0 +1,143 @@
+<app-navbar></app-navbar>  
+<div class="max-w-7xl mx-auto px-4 py-10">  
+
+  <!-- Titre -->  
+  <h2 class="text-4xl font-bold text-secondary text-center mb-12 border-b-4 border-primary pb-3">  
+    Transports Disponibles  
+  </h2>  
+
+  <!-- Formulaire de recherche -->  
+  <form (ngSubmit)="onSearch()" class="bg-white rounded-lg shadow-md p-6 mb-10 space-y-8">  
+
+    <!-- Filtres principaux -->  
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">  
+
+      <!-- Ville départ -->  
+      <div>  
+        <label for="departureCity" class="block mb-2 text-gray-700 font-medium">Ville départ</label>  
+        <select id="departureCity" [(ngModel)]="departureCityFilter" name="departureCity" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition" (change)="onSearch()">  
+          <option value="">Toutes les villes</option>  
+          <option value="Marrakech">Marrakech</option>  
+          <option value="Casablanca">Casablanca</option>  
+          <option value="Rabat">Rabat</option>  
+          <option value="Fès">Fès</option>  
+          <option value="Toulouse">Toulouse</option>  
+        </select>  
+      </div>  
+
+      <!-- Ville arrivée -->  
+      <div>  
+        <label for="arrivalCity" class="block mb-2 text-gray-700 font-medium">Ville arrivée</label>  
+        <select id="arrivalCity" [(ngModel)]="arrivalCityFilter" name="arrivalCity" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition" (change)="onSearch()">  
+          <option value="">Toutes les villes</option>  
+          <option value="Marrakech">Marrakech</option>  
+          <option value="Casablanca">Casablanca</option>  
+          <option value="Rabat">Rabat</option>  
+          <option value="Fès">Fès</option>  
+          <option value="Toulouse">Toulouse</option>  
+        </select>  
+      </div>  
+
+      <!-- Type -->  
+      <div>  
+        <label for="type" class="block mb-2 text-gray-700 font-medium">Type</label>  
+        <select id="type" [(ngModel)]="typeFilter" name="type" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition" (change)="onSearch()">  
+          <option value="">Tous types</option>  
+          <option value="PLANE">Avion</option>  
+          <option value="BUS">Bus</option>  
+          <option value="TRAIN">Train</option>  
+          <option value="CAR">Véhicule privé</option>  
+        </select>  
+      </div>  
+
+    </div>  
+
+    <!-- Plage de prix et date -->  
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">  
+
+      <!-- Plage de prix -->  
+      <div>  
+        <label for="priceRange" class="block mb-2 text-gray-700 font-medium">Plage de prix</label>  
+        <select id="priceRange" [(ngModel)]="priceRangeFilter" name="priceRange" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition" (change)="onSearch()">  
+          <option value="">Tout prix</option>  
+          <option value="0-500">0 - 500 MAD</option>  
+          <option value="500-1000">500 - 1000 MAD</option>  
+          <option value="1000-2000">1000 - 2000 MAD</option>  
+          <option value="2000+">Plus de 2000 MAD</option>  
+        </select>  
+      </div>  
+
+      <!-- Date départ -->  
+      <div>  
+        <label for="date" class="block mb-2 text-gray-700 font-medium">Date départ</label>  
+        <input  
+          type="date"  
+          id="date"  
+          [(ngModel)]="dateFilter"  
+          name="date"  
+          class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition"  
+          (change)="onSearch()"  
+        />  
+      </div>  
+
+      <!-- Prix min -->  
+           <!-- Prix min -->
+      <div>
+        <label for="minPrice" class="block mb-2 text-gray-700 font-medium">Prix min (MAD)</label>
+        <input
+          type="number"
+          id="minPrice"
+          [(ngModel)]="minPriceFilter"
+          name="minPrice"
+          placeholder="Min"
+          class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition"
+          (change)="onSearch()"
+        />
+      </div>
+
+      <!-- Prix max -->
+      <div>
+        <label for="maxPrice" class="block mb-2 text-gray-700 font-medium">Prix max (MAD)</label>
+        <input
+          type="number"
+          id="maxPrice"
+          [(ngModel)]="maxPriceFilter"
+          name="maxPrice"
+          placeholder="Max"
+          class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary transition"
+          (change)="onSearch()"
+        />
+      </div>
+
+    </div>
+
+    <!-- Bouton de recherche -->
+    <div class="mt-8 flex justify-end">
+      <button
+        type="submit"
+        class="bg-primary hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-md shadow-lg transition duration-300"
+      >
+        Rechercher
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Résultats filtrés -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div
+      *ngFor="let transport of filteredTransports"
+      class="bg-white rounded-lg shadow-lg p-6 flex flex-col hover:shadow-xl transition-shadow duration-300"
+    >
+      <div class="font-semibold text-lg mb-2">{{ transport.type }}</div>
+      <div class="mb-2">De {{ transport.departureCity }} à {{ transport.arrivalCity }}</div>
+      <div class="mb-2">Départ : {{ transport.departureTime | date: 'short' }}</div>
+      <div class="mb-2">Arrivée : {{ transport.arrivalTime | date: 'short' }}</div>
+      <div class="font-bold text-primary mb-4">{{ transport.price }} MAD</div>
+      <button class="mt-auto bg-secondary hover:bg-green-700 text-white py-2 px-4 rounded transition duration-300">
+        Réserver
+      </button>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>

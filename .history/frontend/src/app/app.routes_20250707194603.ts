@@ -7,8 +7,7 @@ import { LoginPage } from './pages/login/login.page';
 import { adminRoutes } from './admin/admin.routes'; // Import des routes admin
 import { Oauth2Redirect } from './pages/oauth2-redirect/oauth2-redirect';
 
-import{HotelsPage} from './pages/hotels/hotels.page';
-import{TransportComponent} from './pages/transports/transports.page'
+import{HotelsPage} from './pages/hotels/hotels.page'
 
 
 export const routes: Routes = [
@@ -20,7 +19,7 @@ export const routes: Routes = [
 
 
    { path: 'hotels', component: HotelsPage },
-  { path: 'transports', component: TransportComponent },
+  
 
   // Route pour l'admin avec des enfants
   { 
