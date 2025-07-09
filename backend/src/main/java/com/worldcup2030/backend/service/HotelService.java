@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,15 +29,24 @@ public class HotelService {
         hotel.setAddress(dto.getAddress());
         hotel.setDescription(dto.getDescription());
         hotel.setServices(dto.getServices());
+        hotel.setPhotoPath(dto.getPhotoPath());
 
         Hotel savedHotel = hotelRepository.save(hotel);
         System.out.println("Service - Hôtel sauvegardé : " + savedHotel);
-
         return savedHotel;
     }
 
-    public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
+    public List<HotelDTO> getAllHotels() {
+        List<Hotel> hotels = hotelRepository.findAll();
+        return hotels.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public HotelDTO getHotelById(Long id) {
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hôtel non trouvé avec l'ID : " + id));
+        return convertToDTO(hotel);
     }
 
     public Hotel findById(Long id) {
@@ -58,6 +68,25 @@ public class HotelService {
         hotel.setDescription(dto.getDescription());
         hotel.setServices(dto.getServices());
 
+        // Mettre à jour le chemin de la photo seulement si fourni
+        if (dto.getPhotoPath() != null) {
+            hotel.setPhotoPath(dto.getPhotoPath());
+        }
+
         return hotelRepository.save(hotel);
+    }
+
+    // Méthode utilitaire pour convertir Hotel en HotelDTO
+    private HotelDTO convertToDTO(Hotel hotel) {
+        return new HotelDTO(
+                hotel.getId(),
+                hotel.getName(),
+                hotel.getCity(),
+                hotel.getStars(),
+                hotel.getAddress(),
+                hotel.getDescription(),
+                hotel.getServices(),
+                hotel.getPhotoPath()
+        );
     }
 }
