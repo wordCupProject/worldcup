@@ -35,8 +35,9 @@ export class HotelsPage {
   showModal = false;
   selectedHotel: HotelDTO | null = null;
 
-  constructor(private hotelService: HotelService) {
+  constructor(public hotelService: HotelService) {
     // Charger la liste initiale si besoin (ajouter méthode getHotels() dans service)
+    this.loadHotels(); // <-- appel au chargement
   }
 
   addHotel() {
@@ -65,6 +66,7 @@ export class HotelsPage {
             description: this.hotelForm.description,
             services: selectedServices
           });
+         this.loadHotels();
           this.resetForm();
         },
         error: (err) => {
@@ -138,4 +140,16 @@ export class HotelsPage {
       h.name.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+
+  loadHotels() {
+  this.hotelService.getAllHotels().subscribe({
+    next: (data) => {
+      this.hotels = data;
+    },
+    error: (err) => {
+      console.error('Erreur lors du chargement des hôtels :', err);
+    }
+  });
+}
+
 }
