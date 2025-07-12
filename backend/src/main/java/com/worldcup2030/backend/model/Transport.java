@@ -1,6 +1,8 @@
 package com.worldcup2030.backend.model;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -17,7 +19,11 @@ public class Transport {
     private String arrivalCity;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
+    private BigDecimal capacite;
     private BigDecimal price;
+    private BigDecimal place;
+    private String compagnie;
+    
 
     @OneToMany(mappedBy = "transport")
     private List<TransportReservation> reservations;
@@ -43,6 +49,30 @@ public class Transport {
 
     public Long getId() {
         return id;
+    }
+
+    public BigDecimal getCapacite() {
+        return capacite;
+    }
+
+    public void setCapacite(BigDecimal capacite) {
+        this.capacite = capacite;
+    }
+
+    public BigDecimal getPlace() {
+        return place;
+    }
+
+    public void setPlace(BigDecimal place) {
+        this.place = place;
+    }
+
+    public String getCompagnie() {
+        return compagnie;
+    }
+
+    public void setCompagnie(String compagnie) {
+        this.compagnie = compagnie;
     }
 
     public void setId(Long id) {
@@ -112,6 +142,9 @@ public class Transport {
     public void setOffers(List<Offer> offers) {
         this.offers = offers;
     }
+
+ 
+
 
 
     
