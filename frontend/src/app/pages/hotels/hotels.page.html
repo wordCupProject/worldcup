@@ -7,9 +7,7 @@
 
   <!-- Filters -->
   <form (submit)="onSearch(); $event.preventDefault()" class="bg-white p-6 rounded-lg shadow-md mb-10 space-y-6">
-
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
       <div>
         <label for="city" class="block text-gray-700 font-medium mb-2">Ville</label>
         <select id="city" [(ngModel)]="cityFilter" name="city" class="w-full border border-gray-300 rounded-md p-2">
@@ -21,7 +19,6 @@
           <option value="tanger">Tanger</option>
         </select>
       </div>
-
       <div>
         <label for="guests" class="block text-gray-700 font-medium mb-2">Voyageurs</label>
         <select id="guests" [(ngModel)]="guestsFilter" name="guests" class="w-full border border-gray-300 rounded-md p-2">
@@ -32,7 +29,6 @@
           <option value="5">5+ Voyageurs</option>
         </select>
       </div>
-
       <div>
         <label for="price" class="block text-gray-700 font-medium mb-2">Prix (par nuit)</label>
         <select id="price" [(ngModel)]="priceFilter" name="price" class="w-full border border-gray-300 rounded-md p-2">
@@ -43,11 +39,8 @@
           <option value="2000+">Plus de 2000 MAD</option>
         </select>
       </div>
-
     </div>
-
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
       <div>
         <label for="rating" class="block text-gray-700 font-medium mb-2">Classement</label>
         <select id="rating" [(ngModel)]="ratingFilter" name="rating" class="w-full border border-gray-300 rounded-md p-2">
@@ -58,71 +51,52 @@
           <option value="2">2 étoiles</option>
         </select>
       </div>
-
       <div class="flex items-end">
         <button type="submit" class="bg-primary hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-md w-full transition duration-300">
           Rechercher
         </button>
       </div>
-
     </div>
-
   </form>
 
   <!-- Hotels Grid -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
     <div *ngFor="let hotel of filteredHotels" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col">
-
       <div class="h-48 overflow-hidden">
         <img [src]="hotel.image" [alt]="hotel.alt" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500" />
       </div>
-
       <div class="p-6 flex flex-col flex-grow">
-
         <h3 class="text-xl font-semibold text-secondary mb-2">{{ hotel.title }}</h3>
-
         <div class="flex items-center text-gray-500 mb-3">
           <i class="fas fa-map-marker-alt mr-2"></i>
           <span>{{ hotel.city | titlecase }} - {{ hotel.distanceToStadium }} du stade</span>
         </div>
-
         <div class="flex mb-3 text-yellow-400">
           <ng-container *ngFor="let star of [].constructor(hotel.rating); let i = index">
             <i class="fas fa-star" [attr.aria-label]="'star ' + (i + 1)"></i>
           </ng-container>
           <i *ngIf="hotel.ratingHalf" class="fas fa-star-half-alt" aria-label="half star"></i>
         </div>
-
         <div class="flex flex-wrap gap-2 mb-4">
           <span *ngFor="let feature of hotel.features" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">{{ feature }}</span>
         </div>
-
         <div class="text-primary font-bold text-lg mb-3">
           {{ hotel.price }} MAD <span class="text-gray-500 font-normal text-base">/ nuit</span>
         </div>
-
         <div>
-          <span 
-            class="inline-block px-3 py-1 rounded text-sm font-semibold"
-            [ngClass]="{
-              'bg-green-100 text-green-700': hotel.status === 'confirmed',
-              'bg-yellow-100 text-yellow-800': hotel.status === 'pending'
-            }"
-          >
+          <span class="inline-block px-3 py-1 rounded text-sm font-semibold"
+                [ngClass]="{
+                  'bg-green-100 text-green-700': hotel.status === 'confirmed',
+                  'bg-yellow-100 text-yellow-800': hotel.status === 'pending'
+                }">
             {{ hotel.status === 'confirmed' ? 'Disponible' : 'Peu de disponibilités' }}
           </span>
         </div>
-
         <button class="mt-auto bg-secondary hover:bg-green-800 text-white font-semibold py-2 px-4 rounded w-full transition duration-300">
           Réserver maintenant
         </button>
-
       </div>
-
     </div>
-
   </div>
-
 </div>
 <app-footer></app-footer>
