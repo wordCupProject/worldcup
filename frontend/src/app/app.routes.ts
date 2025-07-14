@@ -7,8 +7,9 @@ import { LoginPage } from './pages/login/login.page';
 import { adminRoutes } from './admin/admin.routes'; // Import des routes admin
 import { Oauth2Redirect } from './pages/oauth2-redirect/oauth2-redirect';
 
-import{HotelsPage} from './pages/hotels/hotels.page'
+import { HotelsPage } from './pages/hotels/hotels.page';
 import { DashboardUserPage } from './user/dashboard/dashboard.page';
+import { TransportComponent } from './pages/transports/transports.page';
 
 export const routes: Routes = [
   { path: '', component: DashboardPage },
@@ -16,17 +17,18 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'oauth2-redirect', component: Oauth2Redirect },
   { path: 'hotels', component: HotelsPage },
+  { path: 'transports', component: TransportComponent },
 
-  // ✅ Ajouter ici la route vers le tableau de bord utilisateur
+  // ✅ Route vers le tableau de bord utilisateur
   { path: 'user', component: DashboardUserPage },
 
-  // ✅ Route pour l'admin
-  { 
-    path: 'admin', 
+  // ✅ Route pour l'administration
+  {
+    path: 'admin',
     children: adminRoutes,
     // canActivate: [AuthGuard] // si besoin
   },
 
-  // ❌ Dernière position : le "catch-all"
+  // ❌ Dernière position : redirection par défaut
   { path: '**', redirectTo: '' },
 ];
