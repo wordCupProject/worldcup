@@ -8,26 +8,25 @@ import { adminRoutes } from './admin/admin.routes'; // Import des routes admin
 import { Oauth2Redirect } from './pages/oauth2-redirect/oauth2-redirect';
 
 import{HotelsPage} from './pages/hotels/hotels.page'
-
+import { DashboardUserPage } from './user/dashboard/dashboard.page';
 
 export const routes: Routes = [
   { path: '', component: DashboardPage },
   { path: 'inscription', component: InscriptionPage },
   { path: 'login', component: LoginPage },
+  { path: 'oauth2-redirect', component: Oauth2Redirect },
+  { path: 'hotels', component: HotelsPage },
 
-   { path: 'oauth2-redirect', component: Oauth2Redirect },
+  // ✅ Ajouter ici la route vers le tableau de bord utilisateur
+  { path: 'user', component: DashboardUserPage },
 
-
-   { path: 'hotels', component: HotelsPage },
-  
-
-  // Route pour l'admin avec des enfants
+  // ✅ Route pour l'admin
   { 
     path: 'admin', 
     children: adminRoutes,
-    // Ajouter un garde de route ici si nécessaire
-    // canActivate: [AuthGuard]
+    // canActivate: [AuthGuard] // si besoin
   },
-  
-  { path: '**', redirectTo: '' }
+
+  // ❌ Dernière position : le "catch-all"
+  { path: '**', redirectTo: '' },
 ];
