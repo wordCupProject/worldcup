@@ -23,95 +23,65 @@
                         <h2 class="text-xl font-bold text-dark mb-4 flex items-center">
                             <i class="fas fa-bus text-transport mr-2"></i> Ajouter un transport pour match
                         </h2>
-                        <form class="space-y-4">
-                            <!-- Sélection du match -->
-                            <div>
-                                <label class="block text-gray-700 mb-2">Sélectionner un match</label>
-                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                    <option>Sélectionnez un match</option>
-                                    <option>Maroc vs Brésil - Stade Mohammed V, Casablanca - 15/06/2030</option>
-                                    <option>Espagne vs Allemagne - Stade de Marrakech - 16/06/2030</option>
-                                    <option>France vs Argentine - Stade de Tanger - 18/06/2030</option>
-                                    <option>Portugal vs Pays-Bas - Stade de Rabat - 20/06/2030</option>
-                                    <option>Angleterre vs Belgique - Stade d'Agadir - 22/06/2030</option>
-                                </select>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Type de transport</label>
-                                    <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                        <option>Bus</option>
-                                        <option>Navette</option>
-                                        <option>Train spécial</option>
-                                        <option>Métro</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Compagnie</label>
-                                    <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent" placeholder="Ex: CTM, Casa Transport">
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Nombre de bus</label>
-                                    <input type="number" min="1" value="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Capacité par bus</label>
-                                    <input type="number" min="10" value="50" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Total places</label>
-                                    <input type="text" readonly value="50" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-gray-700 mb-2">Itinéraire</label>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-gray-500 text-sm mb-1">Point de départ</label>
-                                        <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent" placeholder="Ex: Place des Nations Unies">
-                                    </div>
-                                    <div>
-                                        <label class="block text-gray-500 text-sm mb-1">Destination</label>
-                                        <input type="text" readonly value="Stade" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Heure de départ</label>
-                                    <input type="time" value="16:00" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-gray-700 mb-2">Heure de retour</label>
-                                    <input type="time" value="23:00" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-gray-700 mb-2">Prix par personne</label>
-                                <div class="flex items-center">
-                                    <span class="px-4 py-2 border border-r-0 border-gray-300 rounded-l-lg bg-gray-100">MAD</span>
-                                    <input type="number" min="0" value="20" class="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-transport focus:border-transparent">
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-end mt-6">
-                                <button type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-3 hover:bg-gray-300">Annuler</button>
-                                <button type="submit" class="px-6 py-2 bg-transport text-white rounded-lg hover:bg-blue-700 flex items-center">
-                                    <i class="fas fa-plus mr-2"></i> Ajouter le transport
-                                </button>
-                            </div>
-                        </form>
+         <form (ngSubmit)="addTransport()" class="space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-gray-700 mb-2">Type</label>
+      <select class="w-full px-4 py-2 border rounded-lg" [(ngModel)]="transportForm.type" name="type" required>
+        <option value="">-- Sélectionner --</option>
+        <option>Bus</option>
+        <option>Navette</option>
+        <option>Train spécial</option>
+        <option>Métro</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-gray-700 mb-2">Compagnie</label>
+      <input type="text" [(ngModel)]="transportForm.compagnie" name="compagnie" required class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="block text-gray-700 mb-2">Capacité</label>
+      <input type="number" [(ngModel)]="transportForm.capacite" name="capacite" min="10" class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-700 mb-2">Départ</label>
+      <input type="text" [(ngModel)]="transportForm.departureCity" name="departureCity" required class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+    <div>
+      <label class="block text-gray-700 mb-2">Arrivée</label>
+      <input type="text" [(ngModel)]="transportForm.arrivalCity" name="arrivalCity" required class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-gray-700 mb-2">Heure de départ</label>
+      <input type="datetime-local" [(ngModel)]="transportForm.departureTime" name="departureTime" required class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+
+    <div>
+      <label class="block text-gray-700 mb-2">Heure d’arrivée</label>
+      <input type="datetime-local" [(ngModel)]="transportForm.arrivalTime" name="arrivalTime" required class="w-full px-4 py-2 border rounded-lg" />
+    </div>
+  </div>
+
+ 
+  <div>
+    <label class="block text-gray-700 mb-2">Prix (MAD)</label>
+    <input type="number" [(ngModel)]="transportForm.price" name="price" required class="w-full px-4 py-2 border rounded-lg" />
+  </div>
+
+  <div class="flex justify-end">
+    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Ajouter</button>
+  </div>
+</form>
+
+
                     </div>
 
                     <!-- Liste des transports programmés -->
