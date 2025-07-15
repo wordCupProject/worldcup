@@ -18,7 +18,7 @@ import com.worldcup2030.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // autoriser tous les domaines pour le front
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
     @Autowired

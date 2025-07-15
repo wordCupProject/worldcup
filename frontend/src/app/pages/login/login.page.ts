@@ -54,7 +54,7 @@ export class LoginPage {
 }).subscribe({
   next: (res) => {
     localStorage.setItem('token', res.token!); // le `!` indique que `token` est non-null
-    this.router.navigate(['/inscription']);
+    this.router.navigate(['/user']);
   },
   error: (err) => {
     alert(err.error.message || 'Email ou mot de passe incorrect');
