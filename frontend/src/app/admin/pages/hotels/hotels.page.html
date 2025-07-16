@@ -1,4 +1,4 @@
-<main class="flex-1 p-6">
+<main class="flex-1 p-6 min-h-[2000px]">
   <div class="container mx-auto">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-dark mb-2">Gestion des Hôtels</h1>
@@ -6,96 +6,70 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Formulaire d'ajout -->
+      <!-- Formulaire -->
       <div class="bg-white rounded-xl shadow-lg p-6">
-        <h2 class="text-xl font-bold text-dark mb-4 flex items-center">
-          <i class="fas fa-plus-circle text-primary mr-2"></i> Ajouter un nouvel hôtel
-        </h2>
-        <form class="space-y-4" (submit)="addHotel()">
+        <h2 class="text-xl font-bold text-dark mb-4"><i class="fas fa-plus-circle text-primary mr-2"></i> Ajouter un nouvel hôtel</h2>
+        <form class="space-y-4" (submit)="addHotel(); $event.preventDefault()">
           <div>
-            <label class="block text-gray-700 mb-2">Nom de l'hôtel</label>
-            <input [(ngModel)]="hotelForm.name" name="name" type="text"
-                   class="w-full px-4 py-2 border rounded-lg"
-                   placeholder="Ex: Hôtel Kenzi Tower">
+            <label class="block mb-2">Nom de l'hôtel</label>
+            <input [(ngModel)]="hotelForm.name" name="name" class="w-full border rounded-lg px-4 py-2" placeholder="Ex: Hôtel Kenzi Tower" />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-gray-700 mb-2">Ville</label>
-              <select [(ngModel)]="hotelForm.city" name="city"
-                      class="w-full px-4 py-2 border rounded-lg">
+              <label class="block mb-2">Ville</label>
+              <select [(ngModel)]="hotelForm.city" name="city" class="w-full border rounded-lg px-4 py-2">
                 <option disabled selected>Sélectionnez une ville</option>
                 <option *ngFor="let city of cities">{{ city }}</option>
               </select>
             </div>
             <div>
-              <label class="block text-gray-700 mb-2">Nombre d'étoiles</label>
-              <select [(ngModel)]="hotelForm.stars" name="stars"
-                      class="w-full px-4 py-2 border rounded-lg">
+              <label class="block mb-2">Étoiles</label>
+              <select [(ngModel)]="hotelForm.stars" name="stars" class="w-full border rounded-lg px-4 py-2">
                 <option *ngFor="let s of [5,4,3,2,1]">{{ s }}</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label class="block text-gray-700 mb-2">Adresse</label>
-            <input [(ngModel)]="hotelForm.address" name="address" type="text"
-                   class="w-full px-4 py-2 border rounded-lg"
-                   placeholder="Adresse complète">
+            <label class="block mb-2">Adresse</label>
+            <input [(ngModel)]="hotelForm.address" name="address" class="w-full border rounded-lg px-4 py-2" />
           </div>
 
           <div>
-            <label class="block text-gray-700 mb-2">Description</label>
-            <textarea [(ngModel)]="hotelForm.description" name="description"
-                      class="w-full px-4 py-2 border rounded-lg" rows="3"
-                      placeholder="Description de l'hôtel..."></textarea>
+            <label class="block mb-2">Description</label>
+            <textarea [(ngModel)]="hotelForm.description" name="description" rows="3" class="w-full border rounded-lg px-4 py-2"></textarea>
           </div>
 
           <div>
-            <label class="block text-gray-700 mb-2">Services proposés</label>
+            <label class="block mb-2">Services proposés</label>
             <div class="grid grid-cols-2 gap-2">
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="hotelForm.servicesMap.Bar"
-                       name="bar" class="mr-2"> Bar
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="hotelForm.servicesMap.Spa"
-                       name="spa" class="mr-2"> Spa
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="hotelForm.servicesMap.Restaurant"
-                       name="restaurant" class="mr-2"> Restaurant
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="hotelForm.servicesMap.Gym"
-                       name="gym" class="mr-2"> Gym
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="hotelForm.servicesMap.Navette"
-                       name="navette" class="mr-2"> Navette Stade
+              <!-- CORRECTION APPLIQUÉE ICI -->
+              <label *ngFor="let key of serviceKeys" class="flex items-center">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="hotelForm.servicesMap[key]" 
+                  [name]="key" 
+                  class="mr-2" 
+                /> {{ key }}
               </label>
             </div>
           </div>
 
           <div>
-            <label class="block text-gray-700 mb-2">Photo de l'hôtel</label>
-            <input type="file" (change)="onFileSelected($event)" class="hidden" #fileInput>
-            <div class="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50"
-                 (click)="fileInput.click()">
+            <label class="block mb-2">Photo</label>
+            <input type="file" (change)="onFileSelected($event)" class="hidden" #fileInput />
+            <div class="border-2 border-dashed rounded-lg h-32 flex items-center justify-center cursor-pointer hover:bg-gray-50" (click)="fileInput.click()">
               <div class="text-center">
-                <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
-                <p class="text-gray-500 text-sm">Glissez-déposez ou cliquez pour télécharger</p>
+                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                <p class="text-gray-500">Cliquez ou glissez une image ici</p>
               </div>
             </div>
           </div>
 
           <div class="flex justify-end mt-6">
-            <button type="button"
-                    class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-3 hover:bg-gray-300">
-              Annuler
-            </button>
-            <button type="submit"
-                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-600 flex items-center">
+            <button type="reset" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg mr-3">Annuler</button>
+            <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-600 flex items-center">
               <i class="fas fa-plus mr-2"></i> Ajouter l'hôtel
             </button>
           </div>
@@ -105,62 +79,29 @@
       <!-- Liste des hôtels -->
       <div>
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-dark">Liste des Hôtels</h2>
+          <h2 class="text-xl font-bold">Liste des Hôtels</h2>
           <div class="relative">
-            <input [(ngModel)]="searchQuery" type="text"
-                   placeholder="Rechercher un hôtel..."
-                   class="pl-10 pr-4 py-2 rounded-lg border">
+            <input [(ngModel)]="searchQuery" class="pl-10 pr-4 py-2 rounded-lg border" placeholder="Rechercher un hôtel..." />
             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
           </div>
         </div>
 
         <div class="space-y-4">
-          <div *ngFor="let hotel of filteredHotels()" class="hotel-card bg-white rounded-xl overflow-hidden">
-            <!-- Image -->
-            <img *ngIf="hotel.photoPath"
-                 [src]="hotelService.getImageUrl(hotel.photoPath)"
-                 alt="Photo de {{ hotel.name }}"
-                 class="w-full h-48 object-cover" />
-
-            <div class="p-5">
-              <div class="flex justify-between items-start">
-                <div>
-                  <div class="flex items-center">
-                    <h3 class="text-lg font-bold text-dark">{{ hotel.name }}</h3>
-                    <span class="city-tag text-xs font-semibold px-2 py-1 rounded-full ml-3">
-                      {{ hotel.city }}
-                    </span>
-                  </div>
-                  <div class="flex items-center mt-2">
-                    <div class="star-rating text-yellow-400">
-                      <i class="fas fa-star" *ngFor="let _ of [].constructor(hotel.stars)"></i>
-                    </div>
-                    <span class="text-gray-500 text-sm ml-2">{{ hotel.stars }} étoiles</span>
-                  </div>
-                </div>
-                <div class="flex space-x-2">
-                  <button class="p-2 text-primary hover:bg-red-50 rounded-full"
-                          (click)="viewDetails(hotel)">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="p-2 text-blue-500 hover:bg-blue-50 rounded-full">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="p-2 text-red-500 hover:bg-red-50 rounded-full">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-              <p class="text-gray-600 mt-3">{{ hotel.description }}</p>
+          <div *ngFor="let hotel of paginatedHotels" class="bg-white rounded-xl shadow p-4">
+            <img *ngIf="hotel.photoPath" [src]="hotelService.getImageUrl(hotel.photoPath)" class="w-full h-48 object-cover rounded" />
+            <div class="mt-4">
+              <h3 class="text-lg font-bold">{{ hotel.name }}</h3>
+              <p class="text-sm text-gray-500">{{ hotel.city }} - {{ hotel.stars }} étoiles</p>
+              <p class="text-gray-600 mt-2">{{ hotel.description }}</p>
               <div class="mt-2">
-                <span *ngFor="let s of hotel.services"
-                      class="inline-block bg-gray-100 text-gray-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
-                  {{ s }}
-                </span>
+                <span *ngFor="let s of hotel.services" class="bg-gray-100 text-xs text-gray-700 px-2 py-1 rounded mr-2">{{ s }}</span>
               </div>
-              <p class="text-gray-700 mt-2">
-                <i class="fas fa-map-marker-alt text-primary mr-2"></i>{{ hotel.address }}
-              </p>
+              <p class="text-gray-700 mt-2"><i class="fas fa-map-marker-alt mr-2 text-primary"></i>{{ hotel.address }}</p>
+              <div class="flex space-x-2 mt-4">
+                <button class="p-2 text-blue-600 hover:bg-blue-100 rounded" (click)="viewDetails(hotel)"><i class="fas fa-eye"></i></button>
+                <button class="p-2 text-green-600 hover:bg-green-100 rounded"><i class="fas fa-edit"></i></button>
+                <button class="p-2 text-red-600 hover:bg-red-100 rounded"><i class="fas fa-trash"></i></button>
+              </div>
             </div>
           </div>
         </div>
@@ -168,28 +109,44 @@
     </div>
   </div>
 
-  <!-- Modal de détails -->
+  <!-- Modal -->
   <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl">
-      <div class="p-6">
-        <div class="flex justify-between items-start mb-4">
-          <h2 class="text-2xl font-bold text-dark">Détails de l'Hôtel</h2>
-          <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()">
-            <i class="fas fa-times"></i>
-          </button>
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6">
+      <div class="flex justify-between items-start mb-4">
+        <h2 class="text-2xl font-bold">Détails de l'Hôtel</h2>
+        <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-1">
+          <ng-container *ngIf="selectedHotel?.photoPath as photo; else noPhoto">
+            <img [src]="hotelService.getImageUrl(photo)" class="w-full h-48 object-cover rounded-xl" />
+          </ng-container>
+          <ng-template #noPhoto>
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+          </ng-template>
         </div>
+        <div>
+          <p class="font-semibold">{{ selectedHotel?.name }}</p>
+          <p>{{ selectedHotel?.description }}</p>
+          <p>{{ selectedHotel?.address }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Image dans la modal -->
-          <div class="md:col-span-1">
-            <ng-container *ngIf="selectedHotel?.photoPath as photo; else noPhoto">
-              <img [src]="hotelService.getImageUrl(photo)"
-                   alt="Photo de {{ selectedHotel?.name }}"
-                   class="w-full h-48 object-cover rounded-xl mb-4" />
-            </ng-container>
-            <ng-template #noPhoto>
-              <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
-            </ng-template>
-          </div>
-
-       
+  <!-- Pagination -->
+  <div class="flex justify-center items-center mt-6 space-x-4">
+    <button (click)="goToPreviousPage()" 
+            [disabled]="currentPage === 1"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded disabled:opacity-50">
+      ◀ Précédent
+    </button>
+    <span class="text-gray-700 font-medium">Page {{ currentPage }} / {{ totalPages }}</span>
+    <button (click)="goToNextPage()" 
+            [disabled]="currentPage === totalPages"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded disabled:opacity-50">
+      Suivant ▶
+    </button>
+  </div>
+</main>
