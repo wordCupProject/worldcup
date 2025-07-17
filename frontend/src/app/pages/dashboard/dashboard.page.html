@@ -48,12 +48,12 @@
           </div>
         </div>
 
-        <!-- Stat 2 -->
+        <!-- Stat 2 - Hôtels (dynamique) -->
         <div class="bg-white rounded-lg shadow-md p-4">
           <div class="flex justify-between">
             <div>
               <p class="text-sm text-gray-500">Hôtels</p>
-              <p class="text-2xl font-bold text-gray-800">142</p>
+              <p class="text-2xl font-bold text-gray-800">{{ totalHotels }}</p>
             </div>
             <div class="bg-green-100 text-secondary p-2 rounded-lg">
               <i class="fas fa-hotel text-xl"></i>
@@ -61,9 +61,9 @@
           </div>
           <div class="mt-2">
             <div class="h-2 bg-gray-200 rounded-full">
-              <div class="h-2 bg-secondary rounded-full" style="width: 65%"></div>
+              <div class="h-2 bg-secondary rounded-full" [style.width]="bookingPercentage + '%'"></div>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Réservés à 65%</p>
+            <p class="text-xs text-gray-500 mt-1">Réservés à {{ bookingPercentage }}%</p>
           </div>
         </div>
 
@@ -148,44 +148,32 @@
 
     <!-- Section droite -->
     <div class="space-y-6">
-      <!-- Réservations d'hôtels -->
+      <!-- Derniers hôtels ajoutés -->
       <div class="bg-white rounded-lg shadow-md p-6">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">Réservations d'hôtels</h2>
+          <h2 class="text-xl font-bold text-gray-800">Derniers hôtels ajoutés</h2>
           <button class="text-primary hover:text-red-700"><i class="fas fa-plus"></i></button>
         </div>
         <div class="space-y-4">
-          <!-- Hôtel 1 -->
-          <div class="flex items-center">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
-            <div class="ml-4">
-              <h3 class="font-semibold text-gray-800">Hôtel Marrakech Plaza</h3>
-              <p class="text-sm text-gray-600">14-28 juin, 25 chambres</p>
-              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Confirmé</span>
+          <!-- Hôtel dynamique -->
+          <div class="flex items-center" *ngFor="let hotel of latestHotels; let i = index">
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center">
+              <i class="fas fa-hotel text-gray-500"></i>
             </div>
-          </div>
-          <!-- Hôtel 2 -->
-          <div class="flex items-center">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
             <div class="ml-4">
-              <h3 class="font-semibold text-gray-800">Casablanca Royal</h3>
-              <p class="text-sm text-gray-600">15-30 juin, 40 chambres</p>
-              <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">En attente</span>
-            </div>
-          </div>
-          <!-- Hôtel 3 -->
-          <div class="flex items-center">
-            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
-            <div class="ml-4">
-              <h3 class="font-semibold text-gray-800">Rabat Suites</h3>
-              <p class="text-sm text-gray-600">10-25 juin, 15 chambres</p>
-              <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Confirmé</span>
+              <h3 class="font-semibold text-gray-800">{{ hotel.name }}</h3>
+              <p class="text-sm text-gray-600">{{ hotel.city }} - {{ hotel.stars }} étoiles</p>
+              <span [class]="getStatusClass(i)" class="text-xs px-2 py-1 rounded">
+                {{ getStatusText(i) }}
+              </span>
             </div>
           </div>
         </div>
         <div class="mt-6">
-          <button class="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">
-            Gérer les réservations
+          <button 
+            class="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
+            routerLink="/admin/hotels">
+            Gérer les hôtels
           </button>
         </div>
       </div>
@@ -235,19 +223,25 @@
         </div>
       </div>
 
-      <!-- Contact rapide -->
-      <div class="bg-gradient-to-br from-primary to-secondary rounded-lg shadow-md p-6 text-white">
+      <!-- Contact rapide - Version corrigée -->
+           <!-- Contact rapide - Version définitive -->
+     <div class="bg-[linear-gradient(to_bottom_right,#e53e3e,#38a169)] rounded-lg shadow-md p-6 text-white">
         <h2 class="text-xl font-bold mb-2">Contact rapide</h2>
         <p class="mb-4">Besoin d'aide? Contactez notre équipe support</p>
         <div class="flex space-x-3">
-          <button class="flex-1 bg-white text-primary py-2 rounded-lg font-medium hover:bg-gray-100">
+          <button 
+            (click)="callSupport()"
+            class="flex-1 bg-red-800 text-white py-2 rounded-lg font-medium hover:bg-red-900 transition-colors">
             <i class="fas fa-phone mr-2"></i>Appeler
           </button>
-          <button class="flex-1 bg-black bg-opacity-20 text-white py-2 rounded-lg font-medium hover:bg-opacity-30">
+          <button 
+            (click)="emailSupport()"
+            class="flex-1 bg-green-800 text-white py-2 rounded-lg font-medium hover:bg-green-900 transition-colors">
             <i class="fas fa-envelope mr-2"></i>Email
           </button>
         </div>
       </div>
+
     </div>
   </div>
 </main>
