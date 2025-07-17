@@ -5,24 +5,12 @@
   <title>Dashboard - Coupe du Monde Maroc 2030</title>
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <base href="/" />
-  <!-- Tailwind via CDN -->
+  
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
- <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha384-..."
-    crossorigin="anonymous"
-  />
-
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <script>
     tailwind.config = {
@@ -38,9 +26,24 @@
       }
     }
   </script>
+  
+  <style>
+    /* Ajout des couleurs manquantes pour le gradient */
+    .bg-gradient-to-br {
+      background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+    }
+    
+    .from-red-600 {
+      --tw-gradient-from: #e53e3e;
+      --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+    }
+    
+    .to-green-600 {
+      --tw-gradient-to: #38a169;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
   <app-root></app-root>
-  <router-outlet></router-outlet>
 </body>
 </html>
