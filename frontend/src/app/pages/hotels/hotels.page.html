@@ -92,7 +92,8 @@
             {{ hotel.status === 'confirmed' ? 'Disponible' : 'Peu de disponibilités' }}
           </span>
         </div>
-        <button class="mt-auto bg-secondary hover:bg-green-800 text-white font-semibold py-2 px-4 rounded w-full transition duration-300">
+        <button class="mt-auto bg-secondary hover:bg-green-800 text-white font-semibold py-2 px-4 rounded w-full transition duration-300"
+          (click)="navigateToLogin()"> <!-- Correction ici -->
           Réserver maintenant
         </button>
       </div>

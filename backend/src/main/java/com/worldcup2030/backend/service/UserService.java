@@ -1,8 +1,6 @@
 package com.worldcup2030.backend.service;
 
-
 import java.util.Optional;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,23 +46,21 @@ public class UserService {
         return jwtService.generateToken(user.getEmail());
     }
 
-
+    // Optionnel : méthode OAuth2 login ou inscription automatique
     public String loginOrRegisterOauthUser(String email, String firstName, String lastName) {
-    Optional<User> existingUser = userRepository.findByEmail(email);
+        Optional<User> existingUser = userRepository.findByEmail(email);
 
-    if (existingUser.isEmpty()) {
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setFirstName(firstName);
-        newUser.setLastName(lastName);
-        newUser.setPassword("oauth2"); // ou "", ou null, selon ta logique métier
-        newUser.setRole("utilisateur");
+        if (existingUser.isEmpty()) {
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setFirstName(firstName);
+            newUser.setLastName(lastName);
+            newUser.setPassword("oauth2"); // selon logique métier
+            newUser.setRole("utilisateur");
 
-        userRepository.save(newUser);
+            userRepository.save(newUser);
+        }
+
+        return jwtService.generateToken(email);
     }
-
-    return jwtService.generateToken(email);
-}
-
-
 }

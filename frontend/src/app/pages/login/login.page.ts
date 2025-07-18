@@ -53,7 +53,7 @@ export class LoginPage {
   password: this.loginForm.value.password
 }).subscribe({
   next: (res) => {
-    localStorage.setItem('token', res.token!); // le `!` indique que `token` est non-null
+   localStorage.setItem('access_token', res.token!); // le `!` indique que `token` est non-null
     this.router.navigate(['/user']);
   },
   error: (err) => {
@@ -73,6 +73,10 @@ loginWithProvider(provider: string) {
     // Redirection vers le backend Spring Boot (OAuth2 login)
     window.location.href = 'http://localhost:8081/oauth2/authorization/google';
   }
+}
+
+navigateToRegister() {
+  this.router.navigate(['/inscription']);
 }
 
 }

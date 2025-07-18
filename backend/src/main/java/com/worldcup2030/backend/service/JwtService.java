@@ -13,11 +13,10 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-
+    // Clé secrète (doit être suffisamment longue pour HS256)
     private final String SECRET = "ma_clé_super_secrète_ultra_longue_et_complexe_123456";
 
-
-
+    // Génération du token JWT avec email en "sub" et expiration à 1 jour
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
@@ -27,9 +26,10 @@ public class JwtService {
                 .compact();
     }
 
+    // Extraction de l'email à partir du token JWT
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(SECRET.getBytes())
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
