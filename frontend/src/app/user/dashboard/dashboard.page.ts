@@ -1,36 +1,32 @@
-// src/app/user/dashboard/dashboard.page.ts
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms'; // Ajouté
-import { CommonModule } from '@angular/common'; // Ajouté
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReservationService, 
-         HotelReservation, 
-         TransportReservation, 
-         Event } from '../../services/reservation.service';
+import { ReservationService, HotelReservation, TransportReservation, Event } from '../../services/reservation.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.css'],
-   standalone: true,
+  standalone: true,
   imports: [CommonModule, IonicModule, FormsModule],
 })
 export class DashboardUserPage implements OnInit {
+  userEmail: string = '';
   hotelReservations: HotelReservation[] = [];
   transportReservations: TransportReservation[] = [];
   upcomingEvents: Event[] = [];
   userDropdownOpen = false;
   newHotelReservation = false;
   newTransportReservation = false;
+
   stats = {
     hotel: { count: 3, completion: 80 },
     transport: { count: 2, completion: 50 },
     tickets: { count: 5, completion: 90 }
   };
 
-  // Formulaire pour nouvelle réservation
   newHotelForm: any = {
     hotel: '',
     date: '',
@@ -47,12 +43,25 @@ export class DashboardUserPage implements OnInit {
     status: 'En attente'
   };
 
-  constructor(private reservationService: ReservationService) { }
+  constructor(
+    private reservationService: ReservationService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadReservations();
     this.loadEvents();
+    this.loadUserEmail();
   }
+ loadUserEmail(): void {
+    const user = this.authService.getAuthenticatedUser();
+    if (user && user.email) {
+      this.userEmail = user.email;
+    } else {
+      this.userEmail = 'Invité';
+    }
+  }
+ 
 
   loadReservations() {
     this.reservationService.getHotelReservations().subscribe(reservations => {

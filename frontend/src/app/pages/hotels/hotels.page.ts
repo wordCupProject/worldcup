@@ -1,10 +1,10 @@
-// hotels.page.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { HotelService, HotelDTO } from '../../services/hotel.service';
+import { Router } from '@angular/router'; // Ajout de l'import Router
 
 interface Hotel {
   title: string;
@@ -34,7 +34,8 @@ export class HotelsPage implements OnInit {
 
   hotels: Hotel[] = [];
 
-  constructor(private hotelService: HotelService) {}
+  // Injection du Router dans le constructeur
+  constructor(private hotelService: HotelService, private router: Router) {}
 
   ngOnInit(): void {
     this.hotelService.getAllHotels().subscribe({
@@ -73,5 +74,10 @@ export class HotelsPage implements OnInit {
 
   onSearch() {
     // Rien ici, tout est géré par le getter
+  }
+
+  // Méthode pour naviguer vers la page de login
+  navigateToLogin() {
+    this.router.navigate(['/login']);
   }
 }
