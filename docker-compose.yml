@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Base de données MySQL
+  db:
+    image: mysql:8.0
+    container_name: worldcup-db
+    environment:
+      MYSQL_DATABASE: worldcupdb
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpassword
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3307:3306"  # Port externe:3307 → Interne:3306
+    networks:
+      - worldcup-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+  # Backend Spring Boot
+  worldcup-backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: worldcup-backend
+    ports:
+      - "8081:8081"  # Port configuré dans application.properties
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/worldcupdb?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - worldcup-net
+    restart: on-failure
+
+  # Frontend Angular
+  worldcup-frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: worldcup-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - worldcup-backend
+    networks:
+      - worldcup-net
+
+# Déclarations des volumes et réseaux
+volumes:
+  mysql-data:
+
+networks:
+  worldcup-net:
+    driver: bridge
