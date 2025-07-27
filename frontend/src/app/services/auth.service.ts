@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 export interface RegisterPayload {
   firstName: string;
@@ -27,45 +28,50 @@ export interface ApiResponse {
 })
 export class AuthService {
   private baseUrl = 'http://localhost:8081/api/auth';
+  private jwtHelper = new JwtHelperService();
 
   constructor(private http: HttpClient) {}
 
-  // Enregistrement
   register(payload: RegisterPayload): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/register`, payload);
   }
 
-  // Connexion
   login(payload: LoginPayload): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/login`, payload);
   }
 
-  // Sauvegarder token JWT dans localStorage
   saveToken(token: string): void {
     localStorage.setItem('access_token', token);
   }
 
-  // Supprimer token à la déconnexion
   logout(): void {
     localStorage.removeItem('access_token');
   }
 
-  // Récupérer le token JWT
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }
 
-  // Extraire l'email depuis le token JWT
-  getAuthenticatedUser(): { email: string } | null {
+  isAuthenticated(): boolean {
     const token = this.getToken();
-    if (!token) return null;
+    return token != null && !this.jwtHelper.isTokenExpired(token);
+  }
 
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return { email: payload.sub || payload.email };
-    } catch (error) {
-      console.error('Erreur lors du décodage du token :', error);
-      return null;
+  getAuthenticatedUser(): { email: string; id: number } | null {
+    const token = this.getToken();
+    if (token) {
+      try {
+        const decoded = this.jwtHelper.decodeToken(token);
+        console.log('Decoded token:', decoded); // Utile pour déboguer
+        return {
+          email: decoded.sub || decoded.email,
+          id: decoded.id || decoded.userId // Adapte selon ton backend
+        };
+      } catch (e) {
+        console.error('Erreur lors du décodage du token :', e);
+        return null;
+      }
     }
+    return null;
   }
 }

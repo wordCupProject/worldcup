@@ -1,44 +1,79 @@
 package com.worldcup2030.backend.model;
 
-import jakarta.persistence.Entity;
-
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import jakarta.persistence.*;
-
 @Entity
+@Table(name = "hotel_reservations")
 public class HotelReservation {
-    @Id @GeneratedValue
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
+
+    @Column(name = "number_of_rooms", nullable = false)
+    private Integer numberOfRooms;
+
+    @Column(name = "number_of_guests", nullable = false)
+    private Integer numberOfGuests;
+
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    private Room room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 
+    @Column(name = "created_at")
+    private LocalDate createdAt;
+
+    // Constructeurs
     public HotelReservation() {
+        this.createdAt = LocalDate.now();
     }
 
-    public HotelReservation(Long id, LocalDate startDate, LocalDate endDate, BigDecimal totalPrice,
-            PaymentStatus paymentStatus, User user, Room room) {
-        this.id = id;
+    public HotelReservation(LocalDate startDate, LocalDate endDate, Integer numberOfRooms,
+                            Integer numberOfGuests, BigDecimal totalPrice, PaymentStatus paymentStatus,
+                            User user, Hotel hotel) {
         this.startDate = startDate;
         this.endDate = endDate;
+        this.numberOfRooms = numberOfRooms;
+        this.numberOfGuests = numberOfGuests;
         this.totalPrice = totalPrice;
         this.paymentStatus = paymentStatus;
         this.user = user;
+        this.hotel = hotel;
+        this.createdAt = LocalDate.now();
+    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
         this.room = room;
     }
 
+
+    // Getters et Setters
     public Long getId() {
         return id;
     }
@@ -61,6 +96,22 @@ public class HotelReservation {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public Integer getNumberOfRooms() {
+        return numberOfRooms;
+    }
+
+    public void setNumberOfRooms(Integer numberOfRooms) {
+        this.numberOfRooms = numberOfRooms;
+    }
+
+    public Integer getNumberOfGuests() {
+        return numberOfGuests;
+    }
+
+    public void setNumberOfGuests(Integer numberOfGuests) {
+        this.numberOfGuests = numberOfGuests;
     }
 
     public BigDecimal getTotalPrice() {
@@ -87,14 +138,33 @@ public class HotelReservation {
         this.user = user;
     }
 
-    public Room getRoom() {
-        return room;
+    public Hotel getHotel() {
+        return hotel;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setHotel(Hotel hotel) {
+        this.hotel = hotel;
     }
 
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
 
-    
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "HotelReservation{" +
+                "id=" + id +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", numberOfRooms=" + numberOfRooms +
+                ", numberOfGuests=" + numberOfGuests +
+                ", totalPrice=" + totalPrice +
+                ", paymentStatus=" + paymentStatus +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

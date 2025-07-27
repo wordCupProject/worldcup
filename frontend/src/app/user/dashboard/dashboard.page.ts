@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { ReservationService, HotelReservation, TransportReservation, Event } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,13 +46,15 @@ export class DashboardUserPage implements OnInit {
 
   constructor(
     private reservationService: ReservationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.loadReservations();
     this.loadEvents();
     this.loadUserEmail();
+    
   }
  loadUserEmail(): void {
     const user = this.authService.getAuthenticatedUser();
@@ -138,4 +141,10 @@ export class DashboardUserPage implements OnInit {
       this.newTransportReservation = false;
     });
   }
+
+    logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }
+

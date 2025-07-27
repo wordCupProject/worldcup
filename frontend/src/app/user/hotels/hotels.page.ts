@@ -4,9 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { HotelService, HotelDTO } from '../../services/hotel.service';
-import { AuthService } from '../../services/auth.service'; // Import du service d'authentification
+import { AuthService } from '../../services/auth.service';
+import { ReservationModalComponent } from '../components/reservation-modal/reservation-modal.component';
+import { HotelReservationDTO } from '../../services/hotel.reservation.service';
 
 interface Hotel {
+  id?: number;
   title: string;
   city: string;
   distanceToStadium: string;
@@ -22,7 +25,7 @@ interface Hotel {
 @Component({
   selector: 'app-hotels',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ReservationModalComponent],
   templateUrl: './hotels.page.html',
   styleUrls: ['./hotels.page.css']
 })
@@ -33,25 +36,38 @@ export class HotelsUser implements OnInit {
   ratingFilter = '';
 
   hotels: Hotel[] = [];
-
-  // Propriétés ajoutées
   userEmail: string = '';
   userDropdownOpen = false;
 
-  // Injection du service d'authentification
+  // Propriétés pour le modal de réservation
+  showReservationModal = false;
+  selectedHotel: Hotel | null = null;
+
   constructor(
     private hotelService: HotelService, 
     private router: Router,
-    private authService: AuthService // Service ajouté
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Récupération de l'email depuis le service d'authentification
     this.loadUserEmail();
+    this.loadHotels();
+  }
 
+  loadUserEmail(): void {
+    const user = this.authService.getAuthenticatedUser();
+    if (user && user.email) {
+      this.userEmail = user.email;
+    } else {
+      this.userEmail = 'Invité';
+    }
+  }
+
+  loadHotels(): void {
     this.hotelService.getAllHotels().subscribe({
       next: (data: HotelDTO[]) => {
         this.hotels = data.map((dto) => ({
+          id: dto.id,
           title: dto.name,
           city: dto.city,
           distanceToStadium: 'Proche du stade',
@@ -69,25 +85,9 @@ export class HotelsUser implements OnInit {
     });
   }
 
-  // Méthode pour charger l'email de l'utilisateur
-  loadUserEmail(): void {
-    const user = this.authService.getAuthenticatedUser();
-    if (user && user.email) {
-      this.userEmail = user.email;
-    } else {
-      this.userEmail = 'Invité';
-    }
-  }
-
-  // Méthode de déconnexion
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
   get filteredHotels() {
     return this.hotels.filter(hotel => {
-      const cityMatch = this.cityFilter ? hotel.city === this.cityFilter : true;
+      const cityMatch = this.cityFilter ? hotel.city.toLowerCase() === this.cityFilter.toLowerCase() : true;
       const ratingMatch = this.ratingFilter ? hotel.rating === +this.ratingFilter : true;
       const priceMatch = (() => {
         if (!this.priceFilter) return true;
@@ -103,6 +103,38 @@ export class HotelsUser implements OnInit {
     // Rien ici, tout est géré par le getter
   }
 
+  // Nouvelle méthode pour ouvrir le modal de réservation
+  openReservationModal(hotel: Hotel) {
+    const user = this.authService.getAuthenticatedUser();
+    if (!user) {
+      // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.selectedHotel = hotel;
+    this.showReservationModal = true;
+  }
+
+  // Méthode appelée quand le modal se ferme
+  onModalClosed() {
+    this.showReservationModal = false;
+    this.selectedHotel = null;
+  }
+
+  // Méthode appelée quand une réservation est créée avec succès
+  onReservationCreated(reservation: HotelReservationDTO) {
+    console.log('Réservation créée:', reservation);
+    // Optionnel: afficher un message de succès ou rediriger
+    // this.router.navigate(['/user/reservations']);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  // Méthode obsolète, remplacée par openReservationModal
   navigateToLogin() {
     this.router.navigate(['/login']);
   }

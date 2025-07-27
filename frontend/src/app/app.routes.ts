@@ -10,7 +10,8 @@ import { Oauth2Redirect } from './pages/oauth2-redirect/oauth2-redirect';
 import { HotelsPage } from './pages/hotels/hotels.page';
 import { DashboardUserPage } from './user/dashboard/dashboard.page';
 import { TransportComponent } from './pages/transports/transports.page';
-import {HotelsUser} from './user/hotels/hotels.page'
+import { HotelsUser } from './user/hotels/hotels.page';
+import { UserReservationsComponent } from './user/components/reservation-modal/user-reservations.component';
 
 export const routes: Routes = [
   { path: '', component: DashboardPage },
@@ -20,9 +21,10 @@ export const routes: Routes = [
   { path: 'hotels', component: HotelsPage },
   { path: 'transports', component: TransportComponent },
 
-  // ✅ Route vers le tableau de bord utilisateur
+  // ✅ Routes utilisateur
   { path: 'user', component: DashboardUserPage },
-  { path: 'user/hotels', component: HotelsUser},
+  { path: 'user/hotels', component: HotelsUser },
+  { path: 'user/reservations', component: UserReservationsComponent },
 
   // ✅ Route pour l'administration
   {
