@@ -10,6 +10,7 @@ import { Oauth2Redirect } from './pages/oauth2-redirect/oauth2-redirect';
 import { HotelsPage } from './pages/hotels/hotels.page';
 import { DashboardUserPage } from './user/dashboard/dashboard.page';
 import { TransportComponent } from './pages/transports/transports.page';
+import {HotelsUser} from './user/hotels/hotels.page'
 
 export const routes: Routes = [
   { path: '', component: DashboardPage },
@@ -21,6 +22,7 @@ export const routes: Routes = [
 
   // ✅ Route vers le tableau de bord utilisateur
   { path: 'user', component: DashboardUserPage },
+  { path: 'user/hotels', component: HotelsUser},
 
   // ✅ Route pour l'administration
   {
