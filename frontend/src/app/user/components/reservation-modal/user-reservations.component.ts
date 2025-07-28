@@ -179,6 +179,7 @@ export class UserReservationsComponent implements OnInit {
   isLoading = true;
   showCancelModal = false;
   reservationToCancel: HotelReservationDTO | null = null;
+    username: string | undefined;
 
   constructor(
     private reservationService: HotelReservationService,
@@ -195,6 +196,8 @@ export class UserReservationsComponent implements OnInit {
     const user = this.authService.getAuthenticatedUser();
     if (user && user.email) {
       this.userEmail = user.email;
+      this.username=user.firstName;
+      alert(this.userEmail || this.username)
     } else {
       this.userEmail = 'Invité';
     }
