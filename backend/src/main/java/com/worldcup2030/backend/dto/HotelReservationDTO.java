@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 public class HotelReservationDTO {
     private Long id;
+
     private Long userId;
     private String userEmail;
     private Long hotelId;
