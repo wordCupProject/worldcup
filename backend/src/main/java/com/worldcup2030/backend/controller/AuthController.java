@@ -57,7 +57,7 @@ public class AuthController {
 
             // ✅ DIAGNOSTIC IMMÉDIAT : Tester le token généré
             System.out.println("🧪 Testing generated token...");
-            jwtService.debugToken(token);
+
 
             // Vérifier l'extraction de l'ID utilisateur
             Long extractedUserId = jwtService.extractUserId(token);
@@ -101,7 +101,7 @@ public class AuthController {
             System.out.println("🔍 Debug token request received");
 
             // Effectuer le debug du token
-            jwtService.debugToken(token);
+
 
             // Extraire les informations
             Long userId = jwtService.extractUserId(token);

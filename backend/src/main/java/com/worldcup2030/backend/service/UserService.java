@@ -56,7 +56,7 @@ public class UserService {
         String token = jwtService.generateToken(user);
 
         // Debug du token généré
-        jwtService.debugToken(token);
+
 
         return token;
     }
