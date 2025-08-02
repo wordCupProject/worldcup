@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { AuthService } from './auth.service'; // Importer votre AuthService
 
 export interface HotelReservationDTO {
   id?: number;
@@ -24,18 +25,27 @@ export interface HotelReservationDTO {
 export class HotelReservationService {
   private apiUrl = 'http://localhost:8081/api/hotel-reservations';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService // Ajouter AuthService
+  ) {}
 
   createReservation(reservation: HotelReservationDTO): Observable<HotelReservationDTO> {
     console.log('🚀 Creating reservation with data:', reservation);
     
+    // Vérifier l'authentification avant de créer la réservation
+    if (!this.authService.isAuthenticated()) {
+      console.error('❌ User not authenticated for reservation');
+      this.authService.debugToken();
+      return throwError(() => new Error('Vous devez être connecté pour faire une réservation'));
+    }
+
     // Nettoyer et valider les données avant envoi
     const cleanReservation = this.prepareReservationData(reservation);
     console.log('📦 Cleaned reservation data:', cleanReservation);
     
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
+    // Utiliser les headers avec authentification
+    const headers = this.createAuthHeaders();
 
     console.log('🌐 Making HTTP POST request to:', this.apiUrl);
     console.log('📋 Request headers:', headers);
@@ -55,6 +65,31 @@ export class HotelReservationService {
       );
   }
 
+  private createAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    if (token && this.authService.isAuthenticated()) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+      console.log('🔐 Adding Authorization header to reservation request');
+      
+      const user = this.authService.getAuthenticatedUser();
+      console.log('👤 Making reservation request for user:', user);
+    } else {
+      console.warn('⚠️ No valid auth token found for reservation - this may cause 401 errors');
+      
+      if (token) {
+        console.warn('⚠️ Token exists but authentication check failed');
+        this.authService.debugToken();
+      }
+    }
+
+    return headers;
+  }
+
   private prepareReservationData(reservation: HotelReservationDTO): any {
     // S'assurer que tous les champs numériques sont bien des nombres
     const cleaned = {
@@ -65,6 +100,17 @@ export class HotelReservationService {
       numberOfRooms: Number(reservation.numberOfRooms),
       numberOfGuests: Number(reservation.numberOfGuests)
     };
+
+    // Si userId n'est pas fourni, essayer de le récupérer du token
+    if (!cleaned.userId || cleaned.userId <= 0) {
+      const user = this.authService.getAuthenticatedUser();
+      if (user && user.id) {
+        cleaned.userId = user.id;
+        console.log('✅ User ID retrieved from token:', cleaned.userId);
+      } else {
+        throw new Error('Impossible de déterminer l\'ID utilisateur. Veuillez vous reconnecter.');
+      }
+    }
 
     // Validation des données
     if (!cleaned.userId || cleaned.userId <= 0) {
@@ -141,7 +187,8 @@ export class HotelReservationService {
           }
           break;
         case 401:
-          errorMessage = 'Non autorisé. Veuillez vous reconnecter.';
+          errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+          this.handleAuthError();
           break;
         case 403:
           errorMessage = 'Accès refusé.';
@@ -164,34 +211,57 @@ export class HotelReservationService {
     return throwError(() => new Error(errorMessage));
   };
 
-  getUserReservations(userId: number): Observable<HotelReservationDTO[]> {
-    return this.http.get<HotelReservationDTO[]>(`${this.apiUrl}/user/${userId}`)
+  private handleAuthError(): void {
+    console.log('🔄 Authentication error in reservation service - logging out user');
+    this.authService.logout();
+    console.log('🔄 User logged out due to authentication error');
+  }
+
+  getUserReservations(userId?: number): Observable<HotelReservationDTO[]> {
+    // Si userId n'est pas fourni, utiliser celui du token
+    if (!userId) {
+      const user = this.authService.getAuthenticatedUser();
+      if (user && user.id) {
+        userId = user.id;
+      } else {
+        return throwError(() => new Error('Impossible de déterminer l\'ID utilisateur'));
+      }
+    }
+
+    const headers = this.createAuthHeaders();
+    return this.http.get<HotelReservationDTO[]>(`${this.apiUrl}/user/${userId}`, { headers })
       .pipe(catchError(this.handleError));
   }
 
   getAllReservations(): Observable<HotelReservationDTO[]> {
-    return this.http.get<HotelReservationDTO[]>(this.apiUrl)
+    const headers = this.createAuthHeaders();
+    return this.http.get<HotelReservationDTO[]>(this.apiUrl, { headers })
       .pipe(catchError(this.handleError));
   }
 
   getReservationById(id: number): Observable<HotelReservationDTO> {
-    return this.http.get<HotelReservationDTO>(`${this.apiUrl}/${id}`)
+    const headers = this.createAuthHeaders();
+    return this.http.get<HotelReservationDTO>(`${this.apiUrl}/${id}`, { headers })
       .pipe(catchError(this.handleError));
   }
 
   cancelReservation(id: number): Observable<string> {
-    return this.http.put<string>(`${this.apiUrl}/${id}/cancel`, {})
+    const headers = this.createAuthHeaders();
+    return this.http.put<string>(`${this.apiUrl}/${id}/cancel`, {}, { headers })
       .pipe(catchError(this.handleError));
   }
 
   updateReservationStatus(id: number, status: string): Observable<HotelReservationDTO> {
+    const headers = this.createAuthHeaders();
     return this.http.put<HotelReservationDTO>(`${this.apiUrl}/${id}/status`, null, {
+      headers,
       params: { status }
     }).pipe(catchError(this.handleError));
   }
 
   deleteReservation(id: number): Observable<string> {
-    return this.http.delete<string>(`${this.apiUrl}/${id}`)
+    const headers = this.createAuthHeaders();
+    return this.http.delete<string>(`${this.apiUrl}/${id}`, { headers })
       .pipe(catchError(this.handleError));
   }
 }

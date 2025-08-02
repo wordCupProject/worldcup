@@ -5,7 +5,8 @@ public enum PaymentStatus {
     CONFIRMED("Confirmé"),
     CANCELLED("Annulé"),
     REFUNDED("Remboursé"),
-    FAILED("Échec");
+    FAILED("Échec"),
+    PAID("Payé"); // Ajout de la constante PAID
 
     private final String displayName;
 

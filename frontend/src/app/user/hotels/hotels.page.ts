@@ -6,7 +6,9 @@ import { Router } from '@angular/router';
 import { HotelService, HotelDTO } from '../../services/hotel.service';
 import { AuthService } from '../../services/auth.service';
 import { ReservationModalComponent } from '../components/reservation-modal/reservation-modal.component';
+import { PaymentModalComponent } from '../components/reservation-modal/PaymentModal.component';
 import { HotelReservationDTO } from '../../services/hotel.reservation.service';
+import { PaymentDTO } from '../../services/payment.service';
 
 interface Hotel {
   id?: number;
@@ -25,7 +27,7 @@ interface Hotel {
 @Component({
   selector: 'app-hotels',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReservationModalComponent],
+  imports: [CommonModule, FormsModule, ReservationModalComponent, PaymentModalComponent],
   templateUrl: './hotels.page.html',
   styleUrls: ['./hotels.page.css']
 })
@@ -42,6 +44,10 @@ export class HotelsUser implements OnInit {
   // Propriétés pour le modal de réservation
   showReservationModal = false;
   selectedHotel: Hotel | null = null;
+
+  // ✅ NOUVELLES PROPRIÉTÉS POUR LE PAIEMENT
+  showPaymentModal = false;
+  reservationForPayment: any = null; // Contiendra les détails de la réservation créée
 
   constructor(
     private hotelService: HotelService, 
@@ -111,7 +117,6 @@ export class HotelsUser implements OnInit {
   }
 
   onSearch() {
-    // Rien ici, tout est géré par le getter
     console.log('Search triggered');
   }
 
@@ -136,7 +141,7 @@ export class HotelsUser implements OnInit {
       return;
     }
 
-    // Ouvrir le modal
+    // Ouvrir le modal de réservation
     this.selectedHotel = hotel;
     this.showReservationModal = true;
     
@@ -144,22 +149,77 @@ export class HotelsUser implements OnInit {
     console.log('Show modal flag:', this.showReservationModal);
   }
 
-  // Méthode appelée quand le modal se ferme
-  onModalClosed() {
-    console.log('Modal closed');
+  // Méthode appelée quand le modal de réservation se ferme
+  onReservationModalClosed() {
+    console.log('Reservation modal closed');
     this.showReservationModal = false;
     this.selectedHotel = null;
   }
 
-  // Méthode appelée quand une réservation est créée avec succès
-  onReservationCreated(reservation: HotelReservationDTO) {
-    console.log('Réservation créée avec succès:', reservation);
+  // ✅ MÉTHODE MISE À JOUR : Appelée quand une réservation est créée avec succès
+  onReservationCreated(reservationDetails: any) {
+    console.log('🎉 Réservation créée avec succès:', reservationDetails);
     
-    // Afficher une notification de succès (optionnel)
-    alert('Réservation créée avec succès !');
+    // Fermer le modal de réservation
+    this.showReservationModal = false;
+    this.selectedHotel = null;
     
-    // Optionnel: rediriger vers la page des réservations
-    // this.router.navigate(['/user/reservations']);
+    // ✅ OUVRIR LE MODAL DE PAIEMENT
+    this.reservationForPayment = reservationDetails;
+    this.showPaymentModal = true;
+    
+    console.log('💳 Opening payment modal with reservation:', this.reservationForPayment);
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Appelée quand le modal de paiement se ferme
+  onPaymentModalClosed() {
+    console.log('Payment modal closed');
+    this.showPaymentModal = false;
+    this.reservationForPayment = null;
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Appelée quand un paiement est complété avec succès
+  onPaymentCompleted(payment: PaymentDTO) {
+    console.log('💰 Paiement complété avec succès:', payment);
+    
+    // Fermer le modal de paiement
+    this.showPaymentModal = false;
+    this.reservationForPayment = null;
+    
+    // Afficher un message de succès personnalisé
+    this.showSuccessMessage();
+    
+    // Optionnel: rediriger vers la page des réservations après un délai
+    setTimeout(() => {
+      this.router.navigate(['/user/reservations']);
+    }, 3000);
+  }
+
+  // ✅ NOUVELLE MÉTHODE : Afficher un message de succès
+  private showSuccessMessage() {
+    // Créer et afficher un message de succès personnalisé
+    const successDiv = document.createElement('div');
+    successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 transition-all duration-300';
+    successDiv.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <div>
+          <div class="font-bold">Réservation confirmée !</div>
+          <div class="text-sm">Votre paiement a été traité avec succès</div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Supprimer le message après 5 secondes
+    setTimeout(() => {
+      if (successDiv.parentElement) {
+        successDiv.remove();
+      }
+    }, 5000);
   }
 
   logout(): void {
