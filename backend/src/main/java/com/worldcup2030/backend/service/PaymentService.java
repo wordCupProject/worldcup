@@ -2,189 +2,219 @@ package com.worldcup2030.backend.service;
 
 import com.worldcup2030.backend.dto.PaymentDTO;
 import com.worldcup2030.backend.model.*;
-import com.worldcup2030.backend.repository.PaymentRepository;
 import com.worldcup2030.backend.repository.HotelReservationRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.worldcup2030.backend.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
 public class PaymentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+    @Autowired
+    private PaymentRepository paymentRepository;
 
-    private final PaymentRepository paymentRepository;
-    private final HotelReservationRepository reservationRepository;
-    private final PaymentGatewayService paymentGatewayService;
+    @Autowired
+    private HotelReservationRepository reservationRepository;
 
-    public PaymentService(PaymentRepository paymentRepository,
-                          HotelReservationRepository reservationRepository,
-                          PaymentGatewayService paymentGatewayService) {
-        this.paymentRepository = paymentRepository;
-        this.reservationRepository = reservationRepository;
-        this.paymentGatewayService = paymentGatewayService;
+    // Pattern pour valider le format MM/YY ou MM/YYYY
+    private static final Pattern EXPIRY_DATE_PATTERN = Pattern.compile("^(0[1-9]|1[0-2])/([0-9]{2}|[0-9]{4})$");
+
+    public PaymentDTO makePayment(PaymentDTO paymentDTO) {
+        System.out.println("🔄 Processing payment: " + paymentDTO);
+
+        // 1. Valider la réservation
+        HotelReservation reservation = reservationRepository.findById(paymentDTO.getReservationId())
+                .orElseThrow(() -> new IllegalArgumentException("Réservation non trouvée avec l'ID: " + paymentDTO.getReservationId()));
+
+        // 2. Vérifier si un paiement existe déjà pour cette réservation
+        if (paymentRepository.existsByReservationId(paymentDTO.getReservationId())) {
+            throw new IllegalArgumentException("Un paiement existe déjà pour cette réservation");
+        }
+
+        // 3. Valider les données de paiement
+        validatePaymentRequest(paymentDTO);
+
+        // 4. Créer le paiement
+        Payment payment = new Payment();
+        payment.setReservation(reservation);
+        payment.setAmount(paymentDTO.getAmount());
+        payment.setPaymentMethod(paymentDTO.getPaymentMethod());
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+
+        // 5. Traitement spécifique selon la méthode de paiement
+        if (paymentDTO.getPaymentMethod() == PaymentMethod.CREDIT_CARD ||
+                paymentDTO.getPaymentMethod() == PaymentMethod.DEBIT_CARD) {
+
+            // Valider les informations de carte
+            validateCardPayment(paymentDTO);
+
+            // Stocker les informations de carte (sauf le numéro complet et CVV)
+            payment.setCardHolderName(paymentDTO.getCardHolderName());
+            payment.setCardLastFour(getLastFourDigits(paymentDTO.getCardNumber()));
+        }
+
+        // 6. Initier le paiement
+        Payment processedPayment = initiatePayment(payment);
+
+        // 7. Convertir en DTO pour le retour
+        return convertToDTO(processedPayment);
     }
 
-    public PaymentDTO initiatePayment(PaymentDTO paymentDTO) {
-        logger.info("🚀 Initiating payment: {}", paymentDTO);
+    private void validatePaymentRequest(PaymentDTO paymentDTO) {
+        if (paymentDTO.getReservationId() == null || paymentDTO.getReservationId() <= 0) {
+            throw new IllegalArgumentException("ID de réservation invalide");
+        }
 
-        try {
-            validatePaymentRequest(paymentDTO);
-            HotelReservation reservation = getReservationById(paymentDTO.getReservationId());
+        if (paymentDTO.getAmount() == null || paymentDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Montant invalide");
+        }
 
-            if (paymentRepository.hasConfirmedPayment(reservation.getId())) {
-                throw new RuntimeException("Cette réservation a déjà été payée");
-            }
-
-            if (paymentDTO.getAmount().compareTo(reservation.getTotalPrice()) != 0) {
-                throw new RuntimeException("Le montant du paiement ne correspond pas au prix de la réservation");
-            }
-
-            Payment payment = createPaymentEntity(paymentDTO, reservation);
-            Payment savedPayment = paymentRepository.save(payment);
-            logger.info("✅ Payment created with ID: {}", savedPayment.getId());
-
-            return convertToDTO(savedPayment);
-
-        } catch (RuntimeException e) {
-            logger.error("❌ Error initiating payment: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("❌ Unexpected error initiating payment", e);
-            throw new RuntimeException("Erreur lors de l'initiation du paiement: " + e.getMessage(), e);
+        if (paymentDTO.getPaymentMethod() == null) {
+            throw new IllegalArgumentException("Méthode de paiement requise");
         }
     }
 
-    public PaymentDTO processPayment(Long paymentId) {
-        logger.info("💳 Processing payment: {}", paymentId);
+    private void validateCardPayment(PaymentDTO paymentDTO) {
+        if (paymentDTO.getCardHolderName() == null || paymentDTO.getCardHolderName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Nom du titulaire de la carte requis");
+        }
 
-        try {
-            Payment payment = getPaymentById(paymentId);
+        if (paymentDTO.getCardNumber() == null || !isValidCardNumber(paymentDTO.getCardNumber())) {
+            throw new IllegalArgumentException("Numéro de carte invalide");
+        }
 
-            if (payment.getPaymentStatus() != PaymentStatus.PENDING) {
-                throw new RuntimeException("Ce paiement ne peut pas être traité (statut: " + payment.getPaymentStatus() + ")");
+        if (paymentDTO.getExpiryDate() == null || !isValidExpiryDate(paymentDTO.getExpiryDate())) {
+            throw new IllegalArgumentException("Date d'expiration invalide");
+        }
+
+        if (paymentDTO.getCvv() == null || !isValidCVV(paymentDTO.getCvv())) {
+            throw new IllegalArgumentException("Code CVV invalide");
+        }
+    }
+
+    private boolean isValidCardNumber(String cardNumber) {
+        if (cardNumber == null) return false;
+        String cleanNumber = cardNumber.replaceAll("\\s+", "");
+        return cleanNumber.length() >= 13 && cleanNumber.length() <= 19 && cleanNumber.matches("\\d+");
+    }
+
+    private boolean isValidExpiryDate(String expiryDate) {
+        if (expiryDate == null || expiryDate.trim().isEmpty()) {
+            System.out.println("❌ Expiry date is null or empty");
+            return false;
+        }
+
+        String cleanDate = expiryDate.trim();
+
+        // Accepter MM/YY ou MM/YYYY
+        if (EXPIRY_DATE_PATTERN.matcher(cleanDate).matches()) {
+            try {
+                String[] parts = cleanDate.split("/");
+                int month = Integer.parseInt(parts[0]);
+                int year = Integer.parseInt(parts[1]);
+
+                if (year < 100) year += 2000;
+
+                YearMonth cardExpiry = YearMonth.of(year, month);
+                boolean isValid = !cardExpiry.isBefore(YearMonth.now());
+
+                if (!isValid) {
+                    System.out.println("❌ Card expired: " + cardExpiry + " (now: " + YearMonth.now() + ")");
+                } else {
+                    System.out.println("✅ Card expiry date valid: " + cardExpiry);
+                }
+
+                return isValid;
+
+            } catch (Exception e) {
+                System.out.println("❌ Error parsing MM/YYYY expiry: " + cleanDate);
+                return false;
             }
+        }
 
-            PaymentGatewayService.PaymentGatewayResponse gatewayResponse = paymentGatewayService.processPayment(payment);
-            updatePaymentFromGatewayResponse(payment, gatewayResponse);
+        // Accepter YYYY-MM
+        if (cleanDate.matches("^\\d{4}-\\d{2}$")) {
+            try {
+                YearMonth cardExpiry = YearMonth.parse(cleanDate);
+                boolean isValid = !cardExpiry.isBefore(YearMonth.now());
 
-            if (payment.getPaymentStatus() == PaymentStatus.CONFIRMED) {
-                updateReservationPaymentStatus(payment.getReservation(), PaymentStatus.CONFIRMED);
-                logger.info("✅ Payment confirmed and reservation updated");
+                if (!isValid) {
+                    System.out.println("❌ Card expired: " + cardExpiry + " (now: " + YearMonth.now() + ")");
+                } else {
+                    System.out.println("✅ Card expiry date valid: " + cardExpiry);
+                }
+
+                return isValid;
+            } catch (DateTimeParseException e) {
+                System.out.println("❌ Error parsing YYYY-MM expiry: " + cleanDate + " - " + e.getMessage());
+                return false;
+            }
+        }
+
+        System.out.println("❌ Expiry date format invalid: " + cleanDate);
+        return false;
+    }
+
+    private boolean isValidCVV(String cvv) {
+        return cvv != null && cvv.matches("\\d{3,4}");
+    }
+
+    private String getLastFourDigits(String cardNumber) {
+        if (cardNumber == null || cardNumber.length() < 4) return "****";
+        String cleanNumber = cardNumber.replaceAll("\\s+", "");
+        return "****" + cleanNumber.substring(cleanNumber.length() - 4);
+    }
+
+    private Payment initiatePayment(Payment payment) {
+        try {
+            String transactionId = generateTransactionId();
+            payment.setTransactionId(transactionId);
+
+            boolean paymentSuccess = simulatePaymentGateway(payment);
+
+            if (paymentSuccess) {
+                payment.setPaymentStatus(PaymentStatus.CONFIRMED);
+                payment.setPaymentDate(LocalDateTime.now());
+                payment.setPaymentGatewayResponse("Payment processed successfully");
+
+                payment.getReservation().setPaymentStatus(PaymentStatus.valueOf("PAID"));
+                reservationRepository.save(payment.getReservation());
+
+                System.out.println("✅ Payment confirmed: " + transactionId);
             } else {
-                logger.warn("⚠️ Payment failed or pending: {}", payment.getPaymentStatus());
+                payment.setPaymentStatus(PaymentStatus.FAILED);
+                payment.setFailureReason("Paiement refusé par la banque");
+                payment.setPaymentGatewayResponse("Payment declined");
+
+                System.out.println("❌ Payment failed: " + transactionId);
             }
 
-            Payment updatedPayment = paymentRepository.save(payment);
-            return convertToDTO(updatedPayment);
+            return paymentRepository.save(payment);
 
-        } catch (RuntimeException e) {
-            logger.error("❌ Error processing payment: {}", e.getMessage());
-            throw e;
         } catch (Exception e) {
-            logger.error("❌ Unexpected error processing payment", e);
-            throw new RuntimeException("Erreur lors du traitement du paiement: " + e.getMessage(), e);
+            System.out.println("❌ Payment processing error: " + e.getMessage());
+            payment.setPaymentStatus(PaymentStatus.FAILED);
+            payment.setFailureReason("Erreur technique: " + e.getMessage());
+
+            return paymentRepository.save(payment);
         }
     }
 
-    public List<PaymentDTO> getUserPayments(Long userId) {
-        logger.info("📖 Getting payments for user: {}", userId);
-
-        try {
-            List<Payment> payments = paymentRepository.findByUserId(userId);
-            logger.info("✅ Found {} payments for user {}", payments.size(), userId);
-
-            return payments.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            logger.error("❌ Error getting user payments", e);
-            throw new RuntimeException("Erreur lors de la récupération des paiements: " + e.getMessage(), e);
-        }
+    private boolean simulatePaymentGateway(Payment payment) {
+        return Math.random() > 0.1; // 90% de réussite
     }
 
-    public PaymentDTO getPaymentByReservationId(Long reservationId) {
-        logger.info("📖 Getting payment for reservation: {}", reservationId);
-
-        Optional<Payment> paymentOpt = paymentRepository.findByReservationId(reservationId);
-
-        if (paymentOpt.isEmpty()) {
-            throw new RuntimeException("Aucun paiement trouvé pour cette réservation");
-        }
-
-        return convertToDTO(paymentOpt.get());
-    }
-
-    public PaymentDTO refundPayment(Long paymentId) {
-        logger.info("💰 Refunding payment: {}", paymentId);
-
-        try {
-            Payment payment = getPaymentById(paymentId);
-
-            if (payment.getPaymentStatus() != PaymentStatus.CONFIRMED) {
-                throw new RuntimeException("Seuls les paiements confirmés peuvent être remboursés");
-            }
-
-            PaymentGatewayService.PaymentGatewayResponse refundResponse = paymentGatewayService.refundPayment(payment);
-
-            if (refundResponse.isSuccess()) {
-                payment.setPaymentStatus(PaymentStatus.REFUNDED);
-                payment.setPaymentGatewayResponse(refundResponse.getMessage());
-                updateReservationPaymentStatus(payment.getReservation(), PaymentStatus.REFUNDED);
-                logger.info("✅ Payment refunded successfully");
-            } else {
-                throw new RuntimeException("Échec du remboursement: " + refundResponse.getMessage());
-            }
-
-            Payment updatedPayment = paymentRepository.save(payment);
-            return convertToDTO(updatedPayment);
-
-        } catch (RuntimeException e) {
-            logger.error("❌ Error refunding payment: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("❌ Unexpected error refunding payment", e);
-            throw new RuntimeException("Erreur lors du remboursement: " + e.getMessage(), e);
-        }
-    }
-
-    public PaymentDTO cancelPayment(Long paymentId) {
-        logger.info("🚫 Canceling payment: {}", paymentId);
-
-        try {
-            Payment payment = getPaymentById(paymentId);
-
-            if (payment.getPaymentStatus() != PaymentStatus.PENDING) {
-                throw new RuntimeException("Seuls les paiements en attente peuvent être annulés");
-            }
-
-            payment.setPaymentStatus(PaymentStatus.CANCELLED);
-            payment.setFailureReason("Annulé par l'utilisateur");
-
-            Payment updatedPayment = paymentRepository.save(payment);
-            logger.info("✅ Payment canceled successfully");
-
-            return convertToDTO(updatedPayment);
-
-        } catch (RuntimeException e) {
-            logger.error("❌ Error canceling payment: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("❌ Unexpected error canceling payment", e);
-            throw new RuntimeException("Erreur lors de l'annulation du paiement: " + e.getMessage(), e);
-        }
+    private String generateTransactionId() {
+        return "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
     private PaymentDTO convertToDTO(Payment payment) {
@@ -202,100 +232,22 @@ public class PaymentService {
         dto.setCardLastFour(payment.getCardLastFour());
         dto.setPaymentGatewayResponse(payment.getPaymentGatewayResponse());
         dto.setFailureReason(payment.getFailureReason());
+
+        dto.setCardNumber(null); // Données sensibles non renvoyées
+        dto.setCvv(null);
+
         return dto;
     }
 
-    // ================= MÉTHODES PRIVÉES ===================
-
-    private void validatePaymentRequest(PaymentDTO paymentDTO) {
-        if (paymentDTO == null) {
-            throw new IllegalArgumentException("Les données de paiement sont manquantes");
-        }
-        if (paymentDTO.getReservationId() == null || paymentDTO.getReservationId() <= 0) {
-            throw new IllegalArgumentException("ID de réservation invalide");
-        }
-        if (paymentDTO.getAmount() == null || paymentDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Montant invalide");
-        }
-        if (paymentDTO.getPaymentMethod() == null) {
-            throw new IllegalArgumentException("Méthode de paiement manquante");
-        }
-        if (paymentDTO.getPaymentMethod() == PaymentMethod.CREDIT_CARD ||
-                paymentDTO.getPaymentMethod() == PaymentMethod.DEBIT_CARD) {
-            validateCardPayment(paymentDTO);
-        }
+    public PaymentDTO getPaymentByReservationId(Long reservationId) {
+        Payment payment = paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Aucun paiement trouvé pour cette réservation"));
+        return convertToDTO(payment);
     }
 
-    private void validateCardPayment(PaymentDTO paymentDTO) {
-        if (paymentDTO.getCardHolderName() == null || paymentDTO.getCardHolderName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nom du titulaire de la carte manquant");
-        }
-        if (paymentDTO.getCardNumber() == null || !paymentDTO.getCardNumber().matches("^[0-9]{13,19}$")) {
-            throw new IllegalArgumentException("Numéro de carte invalide");
-        }
-        if (paymentDTO.getExpiryDate() == null || !paymentDTO.getExpiryDate().matches("^(0[1-9]|1[0-2])/[0-9]{2}$")) {
-            throw new IllegalArgumentException("Date d'expiration invalide");
-        }
-        if (paymentDTO.getCvv() == null || !paymentDTO.getCvv().matches("^[0-9]{3,4}$")) {
-            throw new IllegalArgumentException("CVV invalide");
-        }
-    }
-
-    private HotelReservation getReservationById(Long reservationId) {
-        return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'ID: " + reservationId));
-    }
-
-    private Payment getPaymentById(Long paymentId) {
-        return paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Paiement non trouvé avec l'ID: " + paymentId));
-    }
-
-    private Payment createPaymentEntity(PaymentDTO paymentDTO, HotelReservation reservation) {
-        Payment payment = new Payment(reservation, paymentDTO.getAmount(), paymentDTO.getPaymentMethod());
-        payment.setTransactionId(generateTransactionId());
-
-        if (paymentDTO.getPaymentMethod() == PaymentMethod.CREDIT_CARD ||
-                paymentDTO.getPaymentMethod() == PaymentMethod.DEBIT_CARD) {
-            payment.setCardHolderName(paymentDTO.getCardHolderName());
-            payment.setCardLastFour(extractLastFourDigits(paymentDTO.getCardNumber()));
-        }
-
-        return payment;
-    }
-
-    private void updatePaymentFromGatewayResponse(Payment payment, PaymentGatewayService.PaymentGatewayResponse response) {
-        if (response.isSuccess()) {
-            payment.setPaymentStatus(PaymentStatus.CONFIRMED);
-            payment.setPaymentDate(LocalDateTime.now());
-        } else {
-            payment.setPaymentStatus(PaymentStatus.FAILED);
-            payment.setFailureReason(response.getMessage());
-        }
-        payment.setPaymentGatewayResponse(response.getFullResponse());
-    }
-
-    private void updateReservationPaymentStatus(HotelReservation reservation, PaymentStatus status) {
-        reservation.setPaymentStatus(status);
-        reservationRepository.save(reservation);
-    }
-
-    private String generateTransactionId() {
-        return "TXN-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-    }
-
-    private String extractLastFourDigits(String cardNumber) {
-        if (cardNumber != null && cardNumber.length() >= 4) {
-            return cardNumber.substring(cardNumber.length() - 4);
-        }
-        return null;
-    }
-
-    public PaymentDTO makePayment(PaymentDTO paymentDTO) {
-        // Étape 1 : créer le paiement
-        PaymentDTO initiatedPayment = initiatePayment(paymentDTO);
-
-        // Étape 2 : le traiter via la passerelle
-        return processPayment(initiatedPayment.getId());
+    public PaymentDTO getPaymentById(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Paiement non trouvé"));
+        return convertToDTO(payment);
     }
 }

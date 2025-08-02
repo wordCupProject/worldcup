@@ -27,27 +27,40 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String email = jwtService.extractUsername(token);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User user = userRepository.findByEmail(email).orElse(null);
+            try {
+                String email = jwtService.extractUsername(token);
 
-                if (user != null) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            user.getEmail(), null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    User user = userRepository.findByEmail(email).orElse(null);
+
+                    if (user != null && jwtService.isTokenValid(token, user)) {
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                user.getEmail(),
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                        System.out.println("✅ JWT Authentication successful for user: " + email);
+                    } else {
+                        System.out.println("❌ JWT Token validation failed for user: " + email);
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("{\"error\":\"Token invalide ou expiré\"}");
+                        return;
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println("❌ JWT Token parsing error: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Token invalide\"}");
+                return;
             }
         }
 

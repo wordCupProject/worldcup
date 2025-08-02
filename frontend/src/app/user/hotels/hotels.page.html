@@ -174,13 +174,21 @@
     </div>
   </div>
 
-  <!-- Modal de réservation -->
+  <!-- ✅ MODAL DE RÉSERVATION -->
   <app-reservation-modal 
     [isVisible]="showReservationModal"
     [hotel]="selectedHotel"
-    (modalClosed)="onModalClosed()"
+    (modalClosed)="onReservationModalClosed()"
     (reservationCreated)="onReservationCreated($event)">
   </app-reservation-modal>
+
+  <!-- ✅ MODAL DE PAIEMENT - NOUVEAU -->
+  <app-payment-modal 
+    [isVisible]="showPaymentModal"
+    [reservationSummary]="reservationForPayment"
+    (modalClosed)="onPaymentModalClosed()"
+    (paymentCompleted)="onPaymentCompleted($event)">
+  </app-payment-modal>
 
   <!-- Footer -->
   <footer class="bg-gray-800 text-white mt-16">
