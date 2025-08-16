@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/hotels/images/**").permitAll() // ✅ Rendre les images publiques
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )

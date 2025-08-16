@@ -53,41 +53,33 @@ public class AuthController {
         try {
             System.out.println("🔐 Login request received for: " + request.getEmail());
 
+            // Authentifier et générer le token
             String token = userService.login(request);
 
-            // ✅ DIAGNOSTIC IMMÉDIAT : Tester le token généré
-            System.out.println("🧪 Testing generated token...");
+            // Récupérer l'utilisateur depuis la BDD
+            Optional<User> userOpt = userService.findByEmail(request.getEmail());
+            if (userOpt.isEmpty()) {
+                throw new RuntimeException("Utilisateur introuvable après login");
+            }
 
-
-            // Vérifier l'extraction de l'ID utilisateur
-            Long extractedUserId = jwtService.extractUserId(token);
-            String extractedEmail = jwtService.extractUsername(token);
-
-            System.out.println("🔍 Token validation results:");
-            System.out.println("   - Extracted User ID: " + extractedUserId);
-            System.out.println("   - Extracted Email: " + extractedEmail);
+            User user = userOpt.get();
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Connexion réussie");
             response.put("token", token);
+            response.put("role", user.getRole());  // ✅ ajout du rôle
 
-            // ✅ AJOUT : Informations de debug dans la réponse (à supprimer en production)
-            response.put("debug", Map.of(
-                    "extractedUserId", extractedUserId,
-                    "extractedEmail", extractedEmail
-            ));
-
-            System.out.println("✅ Login successful for: " + request.getEmail());
+            System.out.println("✅ Login successful for: " + user.getEmail() + " (Role: " + user.getRole() + ")");
             return ResponseEntity.ok(response);
 
         } catch (RuntimeException e) {
             System.err.println("❌ Login failed: " + e.getMessage());
-
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
         }
     }
+
 
     // ✅ NOUVEAU : Endpoint de diagnostic JWT
     @PostMapping("/debug-token")

@@ -1,20 +1,61 @@
-<!-- header.html -->
 <header class="bg-white shadow-md">
   <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <!-- Logo -->
     <div class="flex items-center">
       <i class="fas fa-futbol text-primary text-2xl mr-3"></i>
       <h1 class="text-xl font-bold text-gray-800">World Cup Morocco 2030</h1>
     </div>
-    <div class="flex items-center space-x-4">
+
+    <!-- Actions -->
+    <div class="flex items-center space-x-6">
+
+      <!-- Notifications -->
       <div class="relative">
-        <i class="fas fa-bell text-gray-600"></i>
+        <i class="fas fa-bell text-gray-600 text-lg"></i>
         <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
       </div>
-      <div class="flex items-center">
-        <img src="https://ui-avatars.com/api/?name=Admin&background=C1272D&color=fff" alt="Admin" class="w-8 h-8 rounded-full">
-        <span class="ml-2 font-medium">Admin</span>
+
+      <!-- Menu Admin -->
+      <div class="relative">
+        <button (click)="toggleMenu()" 
+                class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=C1272D&color=fff" 
+               alt="Admin" class="w-8 h-8 rounded-full">
+          <span class="font-medium text-gray-700">Admin</span>
+          <i class="fas fa-chevron-down ml-1 text-sm text-gray-500 transition-transform"
+             [class.rotate-180]="menuOpen"></i>
+        </button>
+
+        <!-- Dropdown complet -->
+        <div *ngIf="menuOpen"
+             class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+
+          <!-- Section Langue -->
+          <button (click)="toggleLangMenu()"
+                  class="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-500 uppercase hover:bg-gray-100 focus:outline-none">
+            Langue
+            <i class="fas fa-chevron-down text-gray-500 transition-transform"
+               [class.rotate-180]="langOpen"></i>
+          </button>
+
+          <!-- Sous-menu Langue scrollable -->
+          <div *ngIf="langOpen" class="max-h-40 overflow-y-auto border-t">
+            <a *ngFor="let lang of languages"
+               (click)="selectLanguage(lang)"
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100 cursor-pointer">
+              <span class="mr-2">{{ lang.flag }}</span> {{ lang.label }}
+            </a>
+          </div>
+
+          <div class="border-t my-1"></div>
+
+          <!-- Déconnexion -->
+          <a href="/logout"
+             class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer">
+            <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </header>
-
