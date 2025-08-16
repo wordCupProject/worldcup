@@ -20,6 +20,7 @@ export interface LoginPayload {
 export interface ApiResponse {
   message?: string;
   token?:   string;
+  role?: string;
 }
 
 export interface AuthUser {
@@ -27,6 +28,7 @@ export interface AuthUser {
   email: string;
   firstName?: string;
   lastName?: string;
+  role?: string; 
 }
 
 @Injectable({

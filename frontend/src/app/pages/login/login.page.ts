@@ -54,7 +54,17 @@ export class LoginPage {
 }).subscribe({
   next: (res) => {
    localStorage.setItem('access_token', res.token!); // le `!` indique que `token` est non-null
-    this.router.navigate(['/user']);
+    if (res.role) {
+          localStorage.setItem('role', res.role);
+        }
+console.log('le roooooooooooole',res.role)
+alert(res.role)
+        // ✅ Redirection selon rôle
+        if (res.role === 'admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/user']);
+        }
   },
   error: (err) => {
     alert(err.error.message || 'Email ou mot de passe incorrect');
