@@ -16,7 +16,7 @@ export class DashboardPage implements OnInit {
   totalHotels: number = 0;
   bookingPercentage: number = 0;
   latestHotels: HotelDTO[] = [];
-
+  daysLeft: number = 0;
   // Coordonnées de support
   supportPhone = '+212522000000';
   supportEmail = 'support@coupedumonde2030.ma';
@@ -25,8 +25,16 @@ export class DashboardPage implements OnInit {
 
   ngOnInit(): void {
     this.loadHotelData();
+    this.calculateDaysLeft();
   }
 
+   calculateDaysLeft(): void {
+    const eventDate = new Date('2030-06-14T00:00:00'); // ouverture
+    const today = new Date();
+
+    const diffTime = eventDate.getTime() - today.getTime();
+    this.daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
   loadHotelData(): void {
     this.hotelService.getAllHotels().subscribe({
       next: (hotels) => {
