@@ -20,5 +20,13 @@ export class TransportService {
     return this.http.post<TransportDTO>(this.baseUrl, transport);
   }
 
+
   // ajoute d'autres méthodes si besoin (update, delete...)
+reserveTransport(userId: number, transportId: number): Observable<any> {
+  return this.http.post<any>(`http://localhost:8081/api/reservations`, {
+    userId,
+    transportId
+  });
+}
+
 }

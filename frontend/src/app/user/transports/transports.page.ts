@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService, RegisterPayload } from '../../services/auth.service';
+import { TransportService } from '../../services/transport.service';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { Router } from '@angular/router';
@@ -23,7 +24,7 @@ interface Transport {
     templateUrl: './transports.page.html',
     styleUrls: ['./transports.page.css']
 })
-export class TransportComponent {
+export class UserTransportComponent {
     departureCityFilter: string = '';
     arrivalCityFilter: string = '';
     typeFilter: string = '';
@@ -36,7 +37,9 @@ export class TransportComponent {
     possibleArrivalCities = ['Marrakech', 'Casablanca', 'Rabat', 'Fès', 'Toulouse'];
     possibleTypes = ['PLANE', 'BUS', 'TRAIN', 'CAR'];
     availableDates = ['2025-07-10', '2025-07-11', '2025-07-12'];
-constructor(private router: Router) {}
+constructor(private router: Router,
+  private authService: AuthService,
+  private transportService: TransportService) {}
     transports: Transport[] = [
         {
             id: 1,
@@ -94,7 +97,25 @@ constructor(private router: Router) {}
     onSearch() {
         // Rien à faire si vous utilisez le getter filteredTransports dans le template
     }
-    navigateToLogin() {
+  
+    onReserve(transport: Transport) {
+  const user = this.authService.getAuthenticatedUser();
+  if (!user) {
+    alert("Vous devez être connecté pour réserver !");
     this.router.navigate(['/login']);
+    return;
   }
+
+  this.transportService.reserveTransport(user.id, transport.id).subscribe({
+    next: (res) => {
+      alert("✅ Réservation réussie !");
+      console.log("Réservation confirmée :", res);
+    },
+    error: (err) => {
+      console.error("❌ Erreur lors de la réservation :", err);
+      alert("Erreur lors de la réservation");
+    }
+  });
+}
+
 }
