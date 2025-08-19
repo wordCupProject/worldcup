@@ -14,6 +14,7 @@ import { HotelsUser } from './user/hotels/hotels.page';
 import { UserReservationsComponent } from './user/components/reservation-modal/user-reservations.component';
 import { AboutPage } from './pages/about/about.page';
 import { EventsPage } from './pages/events/events.page';
+import {UserTransportComponent} from './user/transports/transports.page'
 export const routes: Routes = [
   { path: '', component: DashboardPage },
   { path: 'inscription', component: InscriptionPage },
@@ -27,7 +28,7 @@ export const routes: Routes = [
   { path: 'user', component: DashboardUserPage },
   { path: 'user/hotels', component: HotelsUser },
   { path: 'user/reservations', component: UserReservationsComponent },
-
+   {path: 'user/transports', component:UserTransportComponent},
   // ✅ Route pour l'administration
   {
     path: 'admin',

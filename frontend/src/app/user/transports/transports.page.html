@@ -107,9 +107,11 @@
         {{ transport.price }} MAD
       </div>
       <!-- Bouton réserver plus stylistique -->
-      <button (click)="navigateToLogin()" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-md shadow transition duration-200">
-        Réserver
-      </button>
+     <button 
+  (click)="onReserve(transport)" 
+  class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-md shadow transition duration-200">
+  Réserver
+</button>
     </div>
   </div>
 </div>

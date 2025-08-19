@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { HotelService, HotelDTO } from '../../services/hotel.service';
-import { Router } from '@angular/router'; // Ajout de l'import Router
+import { Router } from '@angular/router'; 
 
 interface Hotel {
   title: string;
