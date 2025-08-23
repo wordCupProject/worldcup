@@ -4,6 +4,6 @@ public enum TransportType {
     BUS,
     NAVETTE,
     TRAIN_SPECIAL,
-    METRO
+    PLANE, TRAIN, CAR, METRO
 }
 
