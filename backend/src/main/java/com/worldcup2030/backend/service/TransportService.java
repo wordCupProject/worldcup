@@ -7,7 +7,9 @@ import com.worldcup2030.backend.repository.TransportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +42,6 @@ public class TransportService {
     }
 
     public TransportDTO updateTransport(Long id, TransportDTO dto) {
-       // Transport existing = transportRepository.findById(id).orElseThrow();
         Transport updated = convertToEntity(dto);
         updated.setId(id);
         Transport saved = transportRepository.save(updated);
@@ -50,17 +51,20 @@ public class TransportService {
     private Transport convertToEntity(TransportDTO dto) {
         Transport transport = new Transport();
 
+        // Conversion correcte pour le format ISO avec "Z"
+        LocalDateTime departureTime = LocalDateTime.ofInstant(
+                Instant.parse(dto.getDepartureTime()), ZoneId.systemDefault());
+        LocalDateTime arrivalTime = LocalDateTime.ofInstant(
+                Instant.parse(dto.getArrivalTime()), ZoneId.systemDefault());
+
         transport.setType(TransportType.valueOf(dto.getType().toUpperCase()));
         transport.setDepartureCity(dto.getDepartureCity());
         transport.setArrivalCity(dto.getArrivalCity());
-
-        transport.setDepartureTime(LocalDateTime.parse(dto.getDepartureTime()));
-        transport.setArrivalTime(LocalDateTime.parse(dto.getArrivalTime()));
-
+        transport.setDepartureTime(departureTime);
+        transport.setArrivalTime(arrivalTime);
         transport.setCapacite(dto.getCapacite());
         transport.setPlace(dto.getCapacite());
         transport.setPrice(dto.getPrice());
-
         transport.setCompagnie(dto.getCompagnie());
 
         return transport;
@@ -75,11 +79,9 @@ public class TransportService {
         dto.setArrivalCity(transport.getArrivalCity());
         dto.setDepartureTime(transport.getDepartureTime().toString());
         dto.setArrivalTime(transport.getArrivalTime().toString());
-
         dto.setCapacite(transport.getCapacite());
-        dto.setPlace(transport.getCapacite());
+        dto.setPlace(transport.getPlace());
         dto.setPrice(transport.getPrice());
-
         dto.setCompagnie(transport.getCompagnie());
 
         return dto;
