@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Arrays;
 
 @RestController
-@RequestMapping("/api/hotels")
+@RequestMapping("/hotels")
 @CrossOrigin(origins = "http://localhost:4200")
 public class HotelController {
 

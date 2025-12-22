@@ -1,4 +1,39 @@
+# Frontend
 /frontend/dist/
 /frontend/node_modules/
-/frontend/.angular/cache/backend/src/main/resources/application.properties
+/frontend/.angular/cache/
+
+# Backend - Application Properties (contient des secrets)
 backend/src/main/resources/application.properties
+
+# Backend - Build & Target
+backend/target/
+backend/.mvn/
+backend/*.log
+
+# Uploads
+backend/uploads/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local

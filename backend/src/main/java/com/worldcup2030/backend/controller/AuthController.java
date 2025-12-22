@@ -16,7 +16,7 @@ import com.worldcup2030.backend.service.JwtService;
 import com.worldcup2030.backend.service.UserService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
@@ -29,7 +29,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            System.out.println("📝 Registration request received for: " + request.getEmail());
+            System.out.println("📝 Registration request received!");
+            System.out.println("   Email: " + request.getEmail());
+            System.out.println("   FirstName: " + request.getFirstName());
+            System.out.println("   LastName: " + request.getLastName());
+            System.out.println("   Phone: " + request.getPhone());
+            System.out.println("   Country: " + request.getCountry());
 
             userService.register(request);
 
@@ -41,10 +46,18 @@ public class AuthController {
 
         } catch (RuntimeException e) {
             System.err.println("❌ Registration failed: " + e.getMessage());
+            e.printStackTrace();
 
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
+        } catch (Exception e) {
+            System.err.println("❌ Unexpected error during registration: " + e.getMessage());
+            e.printStackTrace();
+
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Erreur serveur: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -76,7 +89,7 @@ public class AuthController {
             System.err.println("❌ Login failed: " + e.getMessage());
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("message", e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
 

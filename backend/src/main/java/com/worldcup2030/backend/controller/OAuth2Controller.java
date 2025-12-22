@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @RestController
-@RequestMapping("/api/auth/oauth2")
+@RequestMapping("/auth/oauth2")
 public class OAuth2Controller {
 
     @Autowired

@@ -67,7 +67,22 @@ alert(res.role)
         }
   },
   error: (err) => {
-    alert(err.error.message || 'Email ou mot de passe incorrect');
+    console.error('Erreur de connexion:', err);
+    this.isLoading = false;
+    
+    let errorMessage = 'Une erreur est survenue lors de la connexion.';
+    
+    if (err.status === 0) {
+      errorMessage = 'Impossible de contacter le serveur. Vérifiez que le backend est démarré sur le port 8081.';
+    } else if (err.status === 401 || err.status === 400) {
+      errorMessage = err.error?.message || 'Email ou mot de passe incorrect.';
+    } else if (err.error && err.error.message) {
+      errorMessage = err.error.message;
+    } else if (err.message) {
+      errorMessage = err.message;
+    }
+    
+    alert(errorMessage);
   }
 });
 

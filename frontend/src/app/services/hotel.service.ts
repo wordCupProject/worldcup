@@ -107,6 +107,11 @@ export class HotelService {
   }
 
   getImageUrl(filename: string): string {
+    // Si c'est déjà une URL complète (http:// ou https://), la retourner telle quelle
+    if (filename.startsWith('http://') || filename.startsWith('https://')) {
+      return filename;
+    }
+    // Sinon, construire l'URL vers le serveur local
     return `${this.apiUrl}/images/${filename}`;
   }
 

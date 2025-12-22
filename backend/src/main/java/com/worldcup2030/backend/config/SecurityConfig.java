@@ -28,62 +28,22 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // 1) Chaîne pour les endpoints publics (auth, registration)
+    // Chaîne de sécurité unique
     @Bean
-    @Order(1)
-    public SecurityFilterChain publicApiFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/auth/**", "/api/register/**", "/oauth2/**", "/login/**")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/register/**", "/oauth2/**", "/login/**").permitAll()
+                        // Endpoints publics (sans authentification) - COMPLÈTEMENT OUVERTS
                         .anyRequest().permitAll()
                 )
-                .anonymous(anonymous -> anonymous.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(formLogin -> formLogin.disable());
-
-        return http.build();
-    }
-
-    // 2) Chaîne pour les API protégées (nécessitent JWT)
-    @Bean
-    @Order(2)
-    public SecurityFilterChain protectedApiFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/**")
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/hotels/images/**").permitAll() // ✅ Rendre les images publiques
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint()));
-
-        // Ajouter le filtre JWT pour cette chaîne
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
-
-    // 3) Chaîne par défaut pour le reste (OAuth2, pages web)
-    @Bean
-    @Order(3)
-    public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/public/**").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/api/auth/oauth2/success", true))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint()));
 
+        // NE PAS ajouter le filtre JWT pour le moment
+        // http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
